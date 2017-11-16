@@ -23,11 +23,12 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package be.fedict.lodtools.sbmb;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
@@ -47,18 +48,39 @@ public class PageParser {
 	private final String baseFR;
 
 
+	private LegalDoc parseDesc(Element td, LegalDoc doc) {
+		Element rawtitle = td.selectFirst("font");
+		
+		String t = rawtitle.ownText();
+		String[] split = t.split(". - ", 2);
+		String legalDate = (split.length == 2) ? split[0] : "";
+		String title = (split.length == 2) ? split[1] : "";
+		
+		Element pubdate = rawtitle.selectFirst("font b font");
+		Element source = rawtitle.selectFirst("font font font b font");
+		if (source == null) { // wrong encoding
+			source = rawtitle.selectFirst("font fot font b font");
+		}
+		doc.setDesc(legalDate, title, 
+					pubdate != null ? pubdate.ownText() : null,
+					source != null ? source.ownText() : null);
+		return doc;
+	}
+			
 	/**
+	 * Pase page
 	 * 
 	 * @param year
-	 * @return
+	 * @return 
 	 * @throws MalformedURLException
 	 * @throws IOException 
 	 */
-	public Model parse(int year) throws MalformedURLException, IOException {
-		Model m = new LinkedHashModel();
-		String url = baseNL + year;
-		Document doc = Jsoup.connect(url).ignoreHttpErrors(true).get();
+	public List<LegalDoc> parse(int year) throws MalformedURLException, IOException {
+		List<LegalDoc> l  = new ArrayList();
 		
+		String url = baseNL + year;
+		
+		Document doc = Jsoup.connect(url).ignoreHttpErrors(true).get();
 		if (doc == null) {
 			throw new IOException();
 		}
@@ -69,22 +91,15 @@ public class PageParser {
 			if (tdDesc == null) { // row separator
 				continue;
 			}
-			Element title = tdDesc.selectFirst("font");
-			System.out.println(title.ownText());
-
-			Element pubdate = title.selectFirst("font b font");
-			System.out.println(pubdate.ownText());
-			
-			Element source = title.selectFirst("font font font b font");
-			if (source == null) { // wrong encoding
-				source = title.selectFirst("font fot font b font");
-			}
-			System.out.println(source.ownText());
+			LegalDoc legal = new LegalDoc();
+			parseDesc(tdDesc, legal);
 			
 			Element tdJust = row.selectFirst("td:nth-child(3)");
-			Elements links = tdJust.select("a");	
+			Elements links = tdJust.select("a");
+			
+			l.add(legal);
 		}
-		return m;
+		return l;
 	}
 	
 	/**
