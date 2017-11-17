@@ -23,7 +23,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.fedict.lodtools.sbmb;
+package be.fedict.lodtools.sbmb.helper;
 
 import java.net.URL;
 import java.time.LocalDate;

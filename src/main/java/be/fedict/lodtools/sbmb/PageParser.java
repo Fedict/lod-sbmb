@@ -25,13 +25,12 @@
  */
 package be.fedict.lodtools.sbmb;
 
+import be.fedict.lodtools.sbmb.helper.LegalDoc;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.eclipse.rdf4j.model.Model;
-import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -44,10 +43,7 @@ import org.jsoup.select.Elements;
  * @author Bart.Hanssens
  */
 public class PageParser {
-	private final String baseNL;
-	private final String baseFR;
-
-
+	
 	private LegalDoc parseDesc(Element td, LegalDoc doc) {
 		Element rawtitle = td.selectFirst("font");
 		
@@ -66,21 +62,37 @@ public class PageParser {
 					source != null ? source.ownText() : null);
 		return doc;
 	}
-			
+	
+	private LegalDoc parseLinks(Element td, LegalDoc doc) {
+		Elements links = td.select("a");
+		for (Element link: links) {
+			try {
+				URL u = new URL(link.attr("href"));
+				if (link.ownText().equals("Justel")) {
+					doc.setJustel(u);
+				} else {
+					doc.setSbmb(u);
+				}
+			} catch (MalformedURLException ex) {
+				//
+			}
+		}
+		return doc;
+	}
+	
 	/**
 	 * Pase page
 	 * 
+	 * @param base
 	 * @param year
 	 * @return 
 	 * @throws MalformedURLException
 	 * @throws IOException 
 	 */
-	public List<LegalDoc> parse(int year) throws MalformedURLException, IOException {
+	public List<LegalDoc> parse(String base, int year) throws MalformedURLException, IOException {
 		List<LegalDoc> l  = new ArrayList();
 		
-		String url = baseNL + year;
-		
-		Document doc = Jsoup.connect(url).ignoreHttpErrors(true).get();
+		Document doc = Jsoup.connect(base + year).ignoreHttpErrors(true).get();
 		if (doc == null) {
 			throw new IOException();
 		}
@@ -95,7 +107,7 @@ public class PageParser {
 			parseDesc(tdDesc, legal);
 			
 			Element tdJust = row.selectFirst("td:nth-child(3)");
-			Elements links = tdJust.select("a");
+			parseLinks(tdJust, legal);
 			
 			l.add(legal);
 		}
@@ -104,11 +116,7 @@ public class PageParser {
 	
 	/**
 	 * 
-	 * @param baseNL
-	 * @param baseFR 
 	 */
-	public PageParser(String baseNL, String baseFR) {
-		this.baseNL = baseNL;
-		this.baseFR = baseFR;
+	public PageParser() {
 	}
 }

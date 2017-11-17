@@ -27,6 +27,15 @@
 package be.fedict.lodtools.sbmb;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+
 
 /**
  * Main class
@@ -34,9 +43,54 @@ import java.io.IOException;
  * @author Bart.Hanssens
  */
 public class Main {
+	private final static Options OPTS = 
+			new Options().addRequiredOption("s", "start", true, "Start year")
+						.addRequiredOption("e", "end", true, "End year")
+						.addRequiredOption("b", "base", true, "Base URL")
+						.addRequiredOption("n", "nl", true, "Dutch type")
+						.addRequiredOption("f", "fr", true, "French type")
+						.addOption("o", "outdir", true, "Output directory");
+	
+	
+	private static CommandLine parseArgs(String[] args) {
+		try {
+			return new DefaultParser().parse(OPTS, args);
+		} catch (ParseException ex) {
+			HelpFormatter help = new HelpFormatter();
+			help.printHelp("", "", OPTS, "");
+			return null;
+		}
+	}
+	
 	public static void main(String[] args) {
-		PageParser pp = new PageParser("http://www.ejustice.just.fgov.be/eli/wet/",
-									"http://www.ejustice.just.fgov.be/eli/loi/");
+		CommandLine cli = parseArgs(args);
+		if (cli == null) {
+			System.exit(-1);
+		}
+		
+		int start = Integer.valueOf(cli.getOptionValue("s"));
+		int end = Integer.valueOf(cli.getOptionValue("e"));
+		if (start == 0 || end == 0 || end < start) {
+			System.exit(-2);
+		}
+		
+		String base = cli.getOptionValue("b");
+		
+		String nl = base + cli.getOptionValue("n");
+		String fr = base + cli.getOptionValue("f");
+
+		String o = cli.getOptionValue("o", ".");
+
+		PageParser pp = new PageParser();
+		
+		for (int year = start; year < end; year++) {
+			pp.parse(nl, year);
+			pp.parse(fr, year);
+		}
+		
+		
+//		"http://www.ejustice.just.fgov.be/eli/wet/",
+//									"http://www.ejustice.just.fgov.be/eli/loi/");
 		try {
 			pp.parse(2017);
 		} catch (IOException ex) {
