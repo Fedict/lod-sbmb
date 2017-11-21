@@ -26,6 +26,7 @@
 package be.fedict.lodtools.sbmb;
 
 import be.fedict.lodtools.sbmb.helper.LegalDoc;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -37,12 +38,16 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Parse overview page
  * 
  * @author Bart.Hanssens
  */
 public class PageParser {
+	private final static Logger LOG = LoggerFactory.getLogger(PageParser.class);
 	
 	private LegalDoc parseDesc(Element td, LegalDoc doc) {
 		Element rawtitle = td.selectFirst("font");
@@ -63,6 +68,13 @@ public class PageParser {
 		return doc;
 	}
 	
+	/**
+	 * Parse links to Justel/MB in overview
+	 * 
+	 * @param td
+	 * @param doc
+	 * @return 
+	 */
 	private LegalDoc parseLinks(Element td, LegalDoc doc) {
 		Elements links = td.select("a");
 		for (Element link: links) {
@@ -74,7 +86,7 @@ public class PageParser {
 					doc.setSbmb(u);
 				}
 			} catch (MalformedURLException ex) {
-				//
+				LOG.warn(ex.getMessage());
 			}
 		}
 		return doc;
@@ -83,13 +95,15 @@ public class PageParser {
 	/**
 	 * Pase page
 	 * 
-	 * @param base
-	 * @param year
-	 * @return 
+	 * @param base base URL
+	 * @param year year (1845 or later)
+	 * @param lang language code
+	 * @return list of legal docs
 	 * @throws MalformedURLException
 	 * @throws IOException 
 	 */
-	public List<LegalDoc> parse(String base, int year) throws MalformedURLException, IOException {
+	public List<LegalDoc> parse(String base, int year, String lang) 
+									throws MalformedURLException, IOException {
 		List<LegalDoc> l  = new ArrayList();
 		
 		Document doc = Jsoup.connect(base + year).ignoreHttpErrors(true).get();
@@ -104,6 +118,8 @@ public class PageParser {
 				continue;
 			}
 			LegalDoc legal = new LegalDoc();
+			legal.setLang(lang);
+			
 			parseDesc(tdDesc, legal);
 			
 			Element tdJust = row.selectFirst("td:nth-child(3)");
@@ -112,11 +128,5 @@ public class PageParser {
 			l.add(legal);
 		}
 		return l;
-	}
-	
-	/**
-	 * 
-	 */
-	public PageParser() {
 	}
 }

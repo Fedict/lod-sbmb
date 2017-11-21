@@ -39,6 +39,7 @@ public class LegalDoc {
 	private String id;
 	private String title;
 	private String source;
+	private String lang;
 	private URL sbmb;
 	private URL justel; 
 	private LocalDate pubDate;
@@ -59,7 +60,14 @@ public class LegalDoc {
 	public void setTitle(String title) {
 		this.title = title;
 	}
+	
+	public String getLang() {
+		return lang;
+	}
 
+	public void setLang(String lang) {
+		this.lang = lang;
+	}
 	public String getSource() {
 		return source;
 	}

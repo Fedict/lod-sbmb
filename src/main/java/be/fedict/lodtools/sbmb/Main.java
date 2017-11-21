@@ -26,15 +26,22 @@
 
 package be.fedict.lodtools.sbmb;
 
+import be.fedict.lodtools.sbmb.helper.LegalDoc;
+
+import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -43,15 +50,34 @@ import org.apache.commons.cli.ParseException;
  * @author Bart.Hanssens
  */
 public class Main {
+	private final static Logger LOG = LoggerFactory.getLogger(Main.class);
+	
 	private final static Options OPTS = 
 			new Options().addRequiredOption("s", "start", true, "Start year")
 						.addRequiredOption("e", "end", true, "End year")
 						.addRequiredOption("b", "base", true, "Base URL")
 						.addRequiredOption("n", "nl", true, "Dutch type")
 						.addRequiredOption("f", "fr", true, "French type")
-						.addOption("o", "outdir", true, "Output directory");
+						.addOption("o", "outdir", true, "Output directory")
+						.addOption("w", "wait", true, "Wait between requests");
 	
+	/**
+	 * Log message and exit with exit code
+	 * 
+	 * @param code system exit code
+	 * @param msg message to be logged
+	 */
+	private static void exit(int code, String msg) {
+		LOG.error(msg);
+		System.exit(code);
+	}
 	
+	/**
+	 * Parse command line arguments
+	 * 
+	 * @param args arguments
+	 * @return commandline object 
+	 */
 	private static CommandLine parseArgs(String[] args) {
 		try {
 			return new DefaultParser().parse(OPTS, args);
@@ -61,40 +87,62 @@ public class Main {
 			return null;
 		}
 	}
-	
+
+	/**
+	 * Main
+	 * 
+	 * @param args 
+	 */
 	public static void main(String[] args) {
 		CommandLine cli = parseArgs(args);
 		if (cli == null) {
-			System.exit(-1);
+			exit(-1, "Couldn't pase command line");
 		}
 		
 		int start = Integer.valueOf(cli.getOptionValue("s"));
 		int end = Integer.valueOf(cli.getOptionValue("e"));
 		if (start == 0 || end == 0 || end < start) {
-			System.exit(-2);
+			exit(-2, "Invalid start/end year combination");
 		}
 		
 		String base = cli.getOptionValue("b");
+		if (! base.startsWith("http")) {
+			base = "http://" + base;
+		}
+		LOG.info("Using base {}", base);
 		
-		String nl = base + cli.getOptionValue("n");
-		String fr = base + cli.getOptionValue("f");
-
 		String o = cli.getOptionValue("o", ".");
-
-		PageParser pp = new PageParser();
-		
-		for (int year = start; year < end; year++) {
-			pp.parse(nl, year);
-			pp.parse(fr, year);
+		File outdir = Paths.get(o).toFile();
+		if (! outdir.canWrite()) {
+			exit(-3, "Can't write to output dir");
 		}
 		
+		int wait = Integer.valueOf(cli.getOptionValue("w", "1")) * 1000;
 		
+		PageParser pp = new PageParser();
+		List<LegalDoc> docs = new ArrayList();		
+		for (int year = start; year < end; year++) {	
+			LOG.info("Year {}", year);
+			try {
+				docs.addAll(pp.parse(base + cli.getOptionValue("n"), year, "nl"));
+				docs.addAll(pp.parse(base + cli.getOptionValue("f"), year, "fr"));
+				Thread.sleep(wait);
+			} catch (IOException ex) {
+				LOG.error(ex.getMessage());
+			} catch (InterruptedException ex) {
+				exit(-4, "Interrupted");
+			}
+		}
+
+					
 //		"http://www.ejustice.just.fgov.be/eli/wet/",
 //									"http://www.ejustice.just.fgov.be/eli/loi/");
+
+		LegalDocWriter w = new LegalDocWriter();
 		try {
-			pp.parse(2017);
+			w.write(docs, outdir);
 		} catch (IOException ex) {
-			ex.printStackTrace();
+			exit(-5, ex.getMessage());
 		}
 	}	
 }
