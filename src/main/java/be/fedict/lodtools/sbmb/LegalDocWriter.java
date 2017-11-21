@@ -25,6 +25,7 @@
  */
 package be.fedict.lodtools.sbmb;
 
+import be.fedict.lodtools.sbmb.helper.ELI;
 import be.fedict.lodtools.sbmb.helper.LegalDoc;
 
 import java.io.BufferedWriter;
@@ -75,13 +76,15 @@ public class LegalDocWriter {
 	public void write(List<LegalDoc> docs, File outdir) throws IOException {
 		Path p = Paths.get(outdir.toString(), "out.nt");
 		
+		IRI agent = F.createIRI("http://org.belgif.be/cbe/org/0307_614_813#id");
+		
 		try (BufferedWriter w = Files.newBufferedWriter(p)) {
 			Model m = new LinkedHashModel();
 			for (LegalDoc doc: docs) {
 				IRI id = F.createIRI(doc.getId());
-				m.add(id, DCTERMS.TITLE, F.createLiteral(doc.getTitle()));
-				m.add(id, DCTERMS.DATE, toDate(doc.getDocDate()));
-				m.add(id, DCTERMS.ISSUED, toDate(doc.getPubDate()));
+				m.add(id, ELI.TITLE, F.createLiteral(doc.getTitle()));
+				m.add(id, ELI.DATE_DOCUMENT, toDate(doc.getDocDate()));
+				m.add(id, ELI.DATE_PUBLICATION, toDate(doc.getPubDate()));
 			}
 			Rio.write(m, w, RDFFormat.NTRIPLES);
 		}

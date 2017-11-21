@@ -43,21 +43,34 @@ public class ELI {
 	
 	public static final Namespace NS = new SimpleNamespace(PREFIX, NAMESPACE);
 
+	public static final IRI DATE_DOCUMENT;
+	public static final IRI DATE_PUBLICATION;
 	public static final IRI FORMAT_PROP;
+	public static final IRI LANGUAGE;
+	public static final IRI LEGALVALUE;
 	public static final IRI PUBLISHER;
+	public static final IRI PUBLISHER_AGENT;
+	public static final IRI TITLE;
 	
 	public static final IRI LEGAL_EXPRESSION;
 	public static final IRI LEGAL_RESOURCE;
-	
+	public static final IRI LEGALVALUE_OFFICIAL;
 	
 	static {
 		final ValueFactory F = SimpleValueFactory.getInstance();
 		
+		DATE_DOCUMENT = F.createIRI(NAMESPACE, "date_document");
+		DATE_PUBLICATION = F.createIRI(NAMESPACE, "date_publication");
 		FORMAT_PROP = F.createIRI(NAMESPACE, "format");
+		LANGUAGE = F.createIRI(NAMESPACE, "language");
+		LEGALVALUE = F.createIRI(NAMESPACE, "legal_value");
 		PUBLISHER = F.createIRI(NAMESPACE, "publisher");
+		PUBLISHER_AGENT = F.createIRI(NAMESPACE, "publisher_agent");
+		TITLE = F.createIRI(NAMESPACE, "title");
 		
 		LEGAL_EXPRESSION = F.createIRI(NAMESPACE, "LegalExpression");		
 		LEGAL_RESOURCE = F.createIRI(NAMESPACE, "LegalResource");
+		LEGALVALUE_OFFICIAL = F.createIRI(NAMESPACE, "LegalValue-official");
 	}
 	
 }
