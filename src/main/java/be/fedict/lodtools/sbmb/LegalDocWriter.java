@@ -37,7 +37,9 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
@@ -46,6 +48,7 @@ import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.DCTERMS;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
 import org.slf4j.Logger;
@@ -60,6 +63,14 @@ public class LegalDocWriter {
 	private final static Logger LOG = LoggerFactory.getLogger(LegalDocWriter.class);
 	
 	private final static ValueFactory F = SimpleValueFactory.getInstance();
+
+	private final static Map<String,IRI> LANGS = new HashMap<>();
+	private final static IRI SBMB = F.createIRI("http://org.belgif.be/cbe/org/0307_614_813#id");
+		
+	static {
+		LANGS.put("nl", F.createIRI("http://publications.europa.eu/resource/authority/language/NED"));
+		LANGS.put("fr", F.createIRI("http://publications.europa.eu/resource/authority/language/FRA"));
+	}
 	
 	private Value toDate(LocalDate d) {
 		Date date = new Date(d.atStartOfDay(ZoneId.systemDefault()).toEpochSecond());
@@ -76,23 +87,24 @@ public class LegalDocWriter {
 	public void write(List<LegalDoc> docs, File outdir) throws IOException {
 		Path p = Paths.get(outdir.toString(), "out.nt");
 		
-		IRI agent = F.createIRI("http://org.belgif.be/cbe/org/0307_614_813#id");
 		
 		try (BufferedWriter w = Files.newBufferedWriter(p)) {
 			Model m = new LinkedHashModel();
 			for (LegalDoc doc: docs) {
 				IRI id = F.createIRI(doc.getId());
-				m.add(id, ELI.TITLE, F.createLiteral(doc.getTitle()));
-				m.add(id, ELI.DATE_DOCUMENT, toDate(doc.getDocDate()));
-				m.add(id, ELI.DATE_PUBLICATION, toDate(doc.getPubDate()));
+				IRI justel = F.createIRI(doc.getJustel().toString());
+				
+				m.add(id, RDF.TYPE, ELI.LEGAL_RESOURCE);
+				m.add(id, ELI.IS_REALISED_BY, justel);
+				m.add(justel, RDF.TYPE, ELI.LEGAL_EXPRESSION);
+				m.add(justel, ELI.REALISES, id);
+				m.add(justel, ELI.LANGUAGE, LANGS.get(doc.getLang()));
+				m.add(justel, ELI.TITLE, F.createLiteral(doc.getTitle()));
+				m.add(justel, ELI.DATE_DOCUMENT, toDate(doc.getDocDate()));
+				m.add(justel, ELI.DATE_PUBLICATION, toDate(doc.getPubDate()));
 			}
 			Rio.write(m, w, RDFFormat.NTRIPLES);
 		}
 	}
-	
-	/**
-	 * 
-	 */
-	public LegalDocWriter() {
-	}
+
 }

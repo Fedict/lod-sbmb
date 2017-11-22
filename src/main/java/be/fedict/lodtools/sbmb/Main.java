@@ -121,11 +121,11 @@ public class Main {
 		
 		PageParser pp = new PageParser();
 		List<LegalDoc> docs = new ArrayList();		
-		for (int year = start; year < end; year++) {	
+		for (int year = start; year <= end; year++) {	
 			LOG.info("Year {}", year);
 			try {
-				docs.addAll(pp.parse(base + cli.getOptionValue("n"), year, "nl"));
-				docs.addAll(pp.parse(base + cli.getOptionValue("f"), year, "fr"));
+				docs.addAll(pp.parse(base, cli.getOptionValue("n"), year, "nl"));
+				docs.addAll(pp.parse(base, cli.getOptionValue("f"), year, "fr"));
 				Thread.sleep(wait);
 			} catch (IOException ex) {
 				LOG.error(ex.getMessage());

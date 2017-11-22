@@ -46,12 +46,16 @@ public class ELI {
 	public static final IRI DATE_DOCUMENT;
 	public static final IRI DATE_PUBLICATION;
 	public static final IRI FORMAT_PROP;
+	public static final IRI IS_REALISED_BY;
 	public static final IRI LANGUAGE;
 	public static final IRI LEGALVALUE;
 	public static final IRI PUBLISHER;
 	public static final IRI PUBLISHER_AGENT;
+	public static final IRI REALISES;
 	public static final IRI TITLE;
-	
+	public static final IRI TYPE_DOCUMENT;
+
+	public static final IRI FORMAT;
 	public static final IRI LEGAL_EXPRESSION;
 	public static final IRI LEGAL_RESOURCE;
 	public static final IRI LEGALVALUE_OFFICIAL;
@@ -62,12 +66,16 @@ public class ELI {
 		DATE_DOCUMENT = F.createIRI(NAMESPACE, "date_document");
 		DATE_PUBLICATION = F.createIRI(NAMESPACE, "date_publication");
 		FORMAT_PROP = F.createIRI(NAMESPACE, "format");
+		IS_REALISED_BY = F.createIRI(NAMESPACE, "is_realised_by");
 		LANGUAGE = F.createIRI(NAMESPACE, "language");
 		LEGALVALUE = F.createIRI(NAMESPACE, "legal_value");
 		PUBLISHER = F.createIRI(NAMESPACE, "publisher");
 		PUBLISHER_AGENT = F.createIRI(NAMESPACE, "publisher_agent");
+		REALISES = F.createIRI(NAMESPACE, "realises");
 		TITLE = F.createIRI(NAMESPACE, "title");
+		TYPE_DOCUMENT = F.createIRI(NAMESPACE, "type_document");
 		
+		FORMAT = F.createIRI(NAMESPACE, "Format");
 		LEGAL_EXPRESSION = F.createIRI(NAMESPACE, "LegalExpression");		
 		LEGAL_RESOURCE = F.createIRI(NAMESPACE, "LegalResource");
 		LEGALVALUE_OFFICIAL = F.createIRI(NAMESPACE, "LegalValue-official");

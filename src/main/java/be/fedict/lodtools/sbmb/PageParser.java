@@ -53,6 +53,7 @@ public class PageParser {
 		Element rawtitle = td.selectFirst("font");
 		
 		String t = rawtitle.ownText();
+		LOG.info("Found {}", t);
 		String[] split = t.split(". - ", 2);
 		String legalDate = (split.length == 2) ? split[0] : "";
 		String title = (split.length == 2) ? split[1] : "";
@@ -60,6 +61,7 @@ public class PageParser {
 		Element pubdate = rawtitle.selectFirst("font b font");
 		Element source = rawtitle.selectFirst("font font font b font");
 		if (source == null) { // wrong encoding
+			LOG.warn("source not found, HTML might be incorrect");
 			source = rawtitle.selectFirst("font fot font b font");
 		}
 		doc.setDesc(legalDate, title, 
@@ -96,17 +98,21 @@ public class PageParser {
 	 * Pase page
 	 * 
 	 * @param base base URL
+	 * @param type legal type
 	 * @param year year (1845 or later)
 	 * @param lang language code
 	 * @return list of legal docs
 	 * @throws MalformedURLException
 	 * @throws IOException 
 	 */
-	public List<LegalDoc> parse(String base, int year, String lang) 
+	public List<LegalDoc> parse(String base, String type, int year, String lang) 
 									throws MalformedURLException, IOException {
 		List<LegalDoc> l  = new ArrayList();
 		
-		Document doc = Jsoup.connect(base + year).ignoreHttpErrors(true).get();
+		String url = base + "/"+ type + "/" + year;
+		LOG.info("Using URL {}", url);
+		
+		Document doc = Jsoup.connect(url).ignoreHttpErrors(true).get();
 		if (doc == null) {
 			throw new IOException();
 		}
