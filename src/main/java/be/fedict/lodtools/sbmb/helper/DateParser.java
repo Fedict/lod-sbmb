@@ -25,91 +25,57 @@
  */
 package be.fedict.lodtools.sbmb.helper;
 
+import be.fedict.lodtools.sbmb.*;
+import be.fedict.lodtools.sbmb.helper.LegalDoc;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.FormatStyle;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Helper class
+ * Date parser helper class
  * 
  * @author Bart.Hanssens
  */
-public class LegalDoc {
-	private String id;
-	private String title;
-	private String source;
-	private String lang;
-	private URL sbmb;
-	private URL justel; 
-	private LocalDate pubDate;
-	private LocalDate docDate;
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
+public class DateParser {
+	private final static Logger LOG = LoggerFactory.getLogger(DateParser.class);
+	
+	private final static DateTimeFormatter SHORT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+	private final static Map<String, DateTimeFormatter> LONGS = new HashMap<>();
+	
+	static {
+		LONGS.put("nl", DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLanguageTag("nl-BE")));
+		LONGS.put("fr", DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLanguageTag("fr-BE")));
 	}
 	
-	public String getLang() {
-		return lang;
-	}
-
-	public void setLang(String lang) {
-		this.lang = lang;
-	}
-	public String getSource() {
-		return source;
-	}
-
-	public void setSource(String source) {
-		this.source = source;
-	}
-
-	public URL getSbmb() {
-		return sbmb;
-	}
-
-	public void setSbmb(URL sbmb) {
-		this.sbmb = sbmb;
-	}
-
-	public URL getJustel() {
-		return justel;
-	}
-
-	public void setJustel(URL justel) {
-		this.justel = justel;
-	}
-
-	public LocalDate getPubDate() {
-		return pubDate;
-	}
-
-	public void setPubDate(LocalDate pubDate) {
-		this.pubDate = pubDate;
-	}
-
-	public LocalDate getDocDate() {
-		return docDate;
-	}
-
-	public void setDocDate(LocalDate docDate) {
-		this.docDate = docDate;
+	public static LocalDate parseShort(String str) throws DateTimeParseException {
+		return LocalDate.parse(str, SHORT);
 	}
 	
-	public void setDesc(LocalDate docDate, String title, LocalDate pubDate, String source) {
-		setTitle(title);
-		setDocDate(docDate);
-		setPubDate(pubDate);
-		setSource(source);
+	public static LocalDate parseLong(String str, String lang) {
+		String d = str.toLowerCase();
+		if (lang.equals("fr")) {
+			d = d.replaceFirst("fe", "fé")
+					.replaceFirst("ut", "ût")
+					.replaceFirst("de", "dé");
+		}
+		return LocalDate.parse(d, LONGS.get(lang));
 	}
 }

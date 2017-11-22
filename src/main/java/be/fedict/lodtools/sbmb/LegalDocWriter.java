@@ -73,6 +73,9 @@ public class LegalDocWriter {
 	}
 	
 	private Value toDate(LocalDate d) {
+		if (d == null) {
+			return null;
+		}
 		Date date = new Date(d.atStartOfDay(ZoneId.systemDefault()).toEpochSecond());
 		return F.createLiteral(date);
 	}

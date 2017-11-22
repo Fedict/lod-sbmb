@@ -25,11 +25,13 @@
  */
 package be.fedict.lodtools.sbmb;
 
+import be.fedict.lodtools.sbmb.helper.DateParser;
 import be.fedict.lodtools.sbmb.helper.LegalDoc;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,25 +50,35 @@ import org.slf4j.LoggerFactory;
  */
 public class PageParser {
 	private final static Logger LOG = LoggerFactory.getLogger(PageParser.class);
-	
-	private LegalDoc parseDesc(Element td, LegalDoc doc) {
+			
+	private LegalDoc parseDesc(Element td, LegalDoc doc, String lang) {
 		Element rawtitle = td.selectFirst("font");
 		
 		String t = rawtitle.ownText();
 		LOG.info("Found {}", t);
+
 		String[] split = t.split(". - ", 2);
-		String legalDate = (split.length == 2) ? split[0] : "";
-		String title = (split.length == 2) ? split[1] : "";
-		
-		Element pubdate = rawtitle.selectFirst("font b font");
-		Element source = rawtitle.selectFirst("font font font b font");
-		if (source == null) { // wrong encoding
-			LOG.warn("source not found, HTML might be incorrect");
-			source = rawtitle.selectFirst("font fot font b font");
+		if (split.length < 2) {
+			LOG.error("Could not split title");
+			return doc;
 		}
-		doc.setDesc(legalDate, title, 
-					pubdate != null ? pubdate.ownText() : null,
-					source != null ? source.ownText() : null);
+		String docstr = split[0];
+		String title = split[1];
+		
+		LocalDate docdate = DateParser.parseLong(docstr, lang);
+		if (docdate == null) {
+			LOG.error("Doc date not found");
+		}
+		
+		Element pubel = rawtitle.selectFirst("font b font");
+		LocalDate pubdate = DateParser.parseShort(pubel.ownText());
+		if (pubdate == null) {
+			LOG.error("Publication date not found");
+		}
+		
+		Element source = rawtitle.selectFirst("font font font b font");
+		
+		doc.setDesc(docdate, title, pubdate, source.ownText());
 		return doc;
 	}
 	
@@ -79,10 +91,15 @@ public class PageParser {
 	 */
 	private LegalDoc parseLinks(Element td, LegalDoc doc) {
 		Elements links = td.select("a");
+		if (links == null) {
+			LOG.error("No links found");
+			return doc;
+		}
 		for (Element link: links) {
 			try {
 				URL u = new URL(link.attr("href"));
-				if (link.ownText().equals("Justel")) {
+				if (link.ownText().trim().equals("Justel")) {
+					doc.setId(u.toString().replaceAll("/justel", ""));
 					doc.setJustel(u);
 				} else {
 					doc.setSbmb(u);
@@ -111,8 +128,9 @@ public class PageParser {
 		
 		String url = base + "/"+ type + "/" + year;
 		LOG.info("Using URL {}", url);
-		
-		Document doc = Jsoup.connect(url).ignoreHttpErrors(true).get();
+
+		Document doc = Jsoup.connect(url).ignoreHttpErrors(true)
+							.execute().charset("ISO-8859-1").parse();
 		if (doc == null) {
 			throw new IOException();
 		}
@@ -126,9 +144,12 @@ public class PageParser {
 			LegalDoc legal = new LegalDoc();
 			legal.setLang(lang);
 			
-			parseDesc(tdDesc, legal);
+			parseDesc(tdDesc, legal, lang);
 			
 			Element tdJust = row.selectFirst("td:nth-child(3)");
+			if (tdJust == null) {
+				LOG.error("No third column found {}", row.html());
+			}
 			parseLinks(tdJust, legal);
 			
 			l.add(legal);
