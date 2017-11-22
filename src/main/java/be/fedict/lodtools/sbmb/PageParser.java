@@ -76,9 +76,12 @@ public class PageParser {
 			LOG.error("Publication date not found");
 		}
 		
-		Element source = rawtitle.selectFirst("font font font b font");
-		
-		doc.setDesc(docdate, title, pubdate, source.ownText());
+		Element srcel = rawtitle.selectFirst("font font font b font");
+		if (srcel == null) {
+			LOG.warn("No publication source found");
+		}
+		String source = (srcel != null) ? srcel.ownText() : null;
+		doc.setDesc(docdate, title, pubdate, source);
 		return doc;
 	}
 	

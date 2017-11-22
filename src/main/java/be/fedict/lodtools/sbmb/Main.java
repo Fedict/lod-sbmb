@@ -126,23 +126,16 @@ public class Main {
 			try {
 				docs.addAll(pp.parse(base, cli.getOptionValue("n"), year, "nl"));
 				docs.addAll(pp.parse(base, cli.getOptionValue("f"), year, "fr"));
+				
+				LegalDocWriter w = new LegalDocWriter();
+				w.write(docs, outdir, year);
+		
 				Thread.sleep(wait);
 			} catch (IOException ex) {
 				LOG.error(ex.getMessage());
 			} catch (InterruptedException ex) {
 				exit(-4, "Interrupted");
 			}
-		}
-
-					
-//		"http://www.ejustice.just.fgov.be/eli/wet/",
-//									"http://www.ejustice.just.fgov.be/eli/loi/");
-
-		LegalDocWriter w = new LegalDocWriter();
-		try {
-			w.write(docs, outdir);
-		} catch (IOException ex) {
-			exit(-5, ex.getMessage());
 		}
 	}	
 }

@@ -47,10 +47,10 @@ import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
-import org.eclipse.rdf4j.model.vocabulary.DCTERMS;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +76,8 @@ public class LegalDocWriter {
 		if (d == null) {
 			return null;
 		}
-		Date date = new Date(d.atStartOfDay(ZoneId.systemDefault()).toEpochSecond());
+
+		Date date = Date.from(d.atStartOfDay(ZoneId.systemDefault()).toInstant());
 		return F.createLiteral(date);
 	}
 	
@@ -85,10 +86,11 @@ public class LegalDocWriter {
 	 * 
 	 * @param docs
 	 * @param outdir output directory
+	 * @param year
 	 * @throws IOException 
 	 */
-	public void write(List<LegalDoc> docs, File outdir) throws IOException {
-		Path p = Paths.get(outdir.toString(), "out.nt");
+	public void write(List<LegalDoc> docs, File outdir, int year) throws IOException {
+		Path p = Paths.get(outdir.toString(), "out" + year + ".nt");
 		
 		
 		try (BufferedWriter w = Files.newBufferedWriter(p)) {
