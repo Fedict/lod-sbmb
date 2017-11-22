@@ -104,7 +104,7 @@ public class LegalDocWriter {
 				m.add(justel, RDF.TYPE, ELI.LEGAL_EXPRESSION);
 				m.add(justel, ELI.REALISES, id);
 				m.add(justel, ELI.LANGUAGE, LANGS.get(doc.getLang()));
-				m.add(justel, ELI.TITLE, F.createLiteral(doc.getTitle()));
+				m.add(justel, ELI.TITLE, F.createLiteral(doc.getTitle(), doc.getLang()));
 				m.add(justel, ELI.DATE_DOCUMENT, toDate(doc.getDocDate()));
 				m.add(justel, ELI.DATE_PUBLICATION, toDate(doc.getPubDate()));
 			}

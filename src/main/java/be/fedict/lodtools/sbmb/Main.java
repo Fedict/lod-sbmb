@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -51,6 +52,8 @@ import org.slf4j.LoggerFactory;
  */
 public class Main {
 	private final static Logger LOG = LoggerFactory.getLogger(Main.class);
+	
+	private final static Random RND = new Random();
 	
 	private final static Options OPTS = 
 			new Options().addRequiredOption("s", "start", true, "Start year")
@@ -88,6 +91,10 @@ public class Main {
 		}
 	}
 
+	private static void sleep(long wait) throws InterruptedException {
+		Thread.sleep(wait + ((long) RND.nextFloat() * wait));
+	}
+	
 	/**
 	 * Main
 	 * 
@@ -117,20 +124,22 @@ public class Main {
 			exit(-3, "Can't write to output dir");
 		}
 		
-		int wait = Integer.valueOf(cli.getOptionValue("w", "1")) * 1000;
+		int wait = Integer.valueOf(cli.getOptionValue("w", "6")) * 1000;
 		
 		PageParser pp = new PageParser();
-		List<LegalDoc> docs = new ArrayList();		
+		List<LegalDoc> docs = new ArrayList();
+		
 		for (int year = start; year <= end; year++) {	
 			LOG.info("Year {}", year);
 			try {
+				sleep(wait);
 				docs.addAll(pp.parse(base, cli.getOptionValue("n"), year, "nl"));
+				
+				sleep(wait);
 				docs.addAll(pp.parse(base, cli.getOptionValue("f"), year, "fr"));
 				
 				LegalDocWriter w = new LegalDocWriter();
 				w.write(docs, outdir, year);
-		
-				Thread.sleep(wait);
 			} catch (IOException ex) {
 				LOG.error(ex.getMessage());
 			} catch (InterruptedException ex) {
