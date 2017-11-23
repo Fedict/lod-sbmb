@@ -95,8 +95,11 @@ public class LegalDocWriter {
 	 * @throws IOException 
 	 */
 	public void write(List<LegalDoc> docs, File outdir, int year) throws IOException {
+		if (docs.isEmpty()) {
+			LOG.warn("Nothing to write for {}", year);
+			return;
+		} 
 		Path p = Paths.get(outdir.toString(), "out-" + year + ".nt");
-		
 		
 		try (BufferedWriter w = Files.newBufferedWriter(p)) {
 			Model m = new LinkedHashModel();

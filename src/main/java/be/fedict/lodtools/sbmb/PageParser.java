@@ -59,10 +59,13 @@ public class PageParser {
 		String t = rawtitle.ownText();
 		LOG.info("Found {}", t);
 
-		String[] split = t.split("\\.? - ", 2);
+		String[] split = t.split("\\.? [-_] ", 2);
 		if (split.length < 2) {
-			LOG.error("Could not split title");
-			return doc;
+			split = t.split(". ", 2);
+			if (split.length < 2) {
+				LOG.error("Could not split title");
+				return doc;
+			}
 		}
 		String docstr = split[0];
 		String title = split[1];
