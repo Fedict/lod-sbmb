@@ -110,8 +110,14 @@ public class LegalDocWriter {
 				m.add(justel, ELI.REALISES, id);
 				m.add(justel, ELI.LANGUAGE, LANGS.get(doc.getLang()));
 				m.add(justel, ELI.TITLE, F.createLiteral(doc.getTitle(), doc.getLang()));
-				m.add(justel, ELI.DATE_DOCUMENT, toDate(doc.getDocDate()));
-				m.add(justel, ELI.DATE_PUBLICATION, toDate(doc.getPubDate()));
+				Value docDate = toDate(doc.getDocDate());
+				if (docDate != null) {
+					m.add(justel, ELI.DATE_DOCUMENT, docDate);
+				}
+				Value pubDate = toDate(doc.getPubDate());
+				if (pubDate != null) {
+					m.add(justel, ELI.DATE_PUBLICATION, pubDate);
+				}
 			}
 			Rio.write(m, w, RDFFormat.NTRIPLES);
 		}

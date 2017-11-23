@@ -43,7 +43,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
 
 import org.mapdb.DB;
@@ -72,7 +71,7 @@ public class Main {
 						.addRequiredOption("b", "base", true, "Base URL")
 						.addRequiredOption("n", "nl", true, "Dutch doc type")
 						.addRequiredOption("f", "fr", true, "French doc type")
-						.addRequiredOption("c", "cache", true, "Cache file")
+						.addOption("c", "cache", true, "Cache file")
 						.addOption("g", "get", false, "Get files from site")
 						.addOption("m", "month", true, "Month")
 						.addOption("o", "outdir", true, "Output directory")
@@ -106,8 +105,9 @@ public class Main {
 		try {
 			return new DefaultParser().parse(OPTS, args);
 		} catch (ParseException ex) {
+			LOG.error(ex.getMessage());
 			HelpFormatter help = new HelpFormatter();
-			help.printHelp("", "", OPTS, "");
+			help.printHelp("lod-sbmb.jar", OPTS);
 			return null;
 		}
 	}
@@ -141,8 +141,8 @@ public class Main {
 	 * @param file
 	 */
 	private static  void getMap(String file) {
-		CACHE = DBMaker.fileDB(file).make();
-		MAP = CACHE.hashMap("sbmb", Serializer.STRING, Serializer.STRING).create();
+		CACHE = DBMaker.fileDB(file).closeOnJvmShutdown().transactionEnable().make();
+		MAP = CACHE.hashMap("sbmb", Serializer.STRING, Serializer.STRING).createOrOpen();
 	}
 	
 	/**
@@ -166,6 +166,7 @@ public class Main {
 				sleep(w);
 				Document page = PARSER.get(base, type.getValue(), year, type.getKey());
 				MAP.put(page.location(), page.body().html());
+				CACHE.commit();
 			}
 		}
 	}
@@ -188,7 +189,10 @@ public class Main {
 			LOG.info("Write docs for year {}", year);
 			
 			for(Entry<String,String> type: types.entrySet()) {
-				String html = MAP.get(base + "/" + type + "/" + year);
+				String html = MAP.get(base + "/" + type.getValue() + "/" + year);
+				if (html == null ||html.isEmpty()) {
+					throw new IOException("Could not get page from cache");
+				}
 				List<LegalDoc> docs = PARSER.parse(html, type.getKey());
 				w.write(docs, f, year);
 			}
@@ -212,7 +216,7 @@ public class Main {
 			exit(-2, "Invalid start/end year combination");
 		}
 	
-		getMap(cli.getOptionValue("c"));	
+		getMap(cli.getOptionValue("c", "cache"));	
 		
 		Map<String,String> types = new HashMap();
 		types.put("nl", cli.getOptionValue("n"));

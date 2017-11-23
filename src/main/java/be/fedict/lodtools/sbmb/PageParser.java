@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import org.jsoup.Connection.Response;
@@ -58,7 +59,7 @@ public class PageParser {
 		String t = rawtitle.ownText();
 		LOG.info("Found {}", t);
 
-		String[] split = t.split(". - ", 2);
+		String[] split = t.split("\\.? - ", 2);
 		if (split.length < 2) {
 			LOG.error("Could not split title");
 			return doc;
@@ -66,15 +67,19 @@ public class PageParser {
 		String docstr = split[0];
 		String title = split[1];
 		
-		LocalDate docdate = DateParser.parseLong(docstr, lang);
-		if (docdate == null) {
-			LOG.error("Doc date not found");
+		LocalDate docdate = null;
+		try  {
+			docdate = DateParser.parseLong(docstr, lang);
+		} catch (DateTimeParseException ex) {
+			LOG.error("Could not parse doc date {}", ex.getMessage());
 		}
 		
+		LocalDate pubdate = null;
 		Element pubel = rawtitle.selectFirst("font b font");
-		LocalDate pubdate = DateParser.parseShort(pubel.ownText());
-		if (pubdate == null) {
-			LOG.error("Publication date not found");
+		try  {
+			pubdate = DateParser.parseShort(pubel.ownText());
+		} catch (DateTimeParseException ex) {
+			LOG.error("Could not parse pub date {}", ex.getMessage());
 		}
 		
 		Element srcel = rawtitle.selectFirst("font font font b font");

@@ -65,16 +65,33 @@ public class DateParser {
 		LONGS.put("fr", DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLanguageTag("fr-BE")));
 	}
 	
+	/**
+	 * Parse short date string to LocalDate
+	 * 
+	 * @param str
+	 * @return
+	 * @throws DateTimeParseException 
+	 */
 	public static LocalDate parseShort(String str) throws DateTimeParseException {
 		return LocalDate.parse(str, SHORT);
 	}
 	
-	public static LocalDate parseLong(String str, String lang) {
+	/**
+	 * Parse long date string to LocalDate
+	 * 
+	 * @param str string to parse
+	 * @param lang language code
+	 * @return local date
+	 * @throws DateTimeParseException 
+	 */
+	public static LocalDate parseLong(String str, String lang) 
+												throws DateTimeParseException{
 		String d = str.toLowerCase();
 		if (lang.equals("fr")) {
 			d = d.replaceFirst("fe", "fé")
 					.replaceFirst("ut", "ût")
-					.replaceFirst("de", "dé");
+					.replaceFirst("de", "dé")
+					.replaceFirst("1er", "1");
 		}
 		return LocalDate.parse(d, LONGS.get(lang));
 	}
