@@ -37,6 +37,11 @@
             <artifactId>rdf4j-rio-ntriples</artifactId>
             <version>${rdf4j.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mapdb</groupId>
+            <artifactId>mapdb</artifactId>
+            <version>3.0.5</version>
+        </dependency>
     </dependencies>
 </project>
 

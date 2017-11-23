@@ -34,6 +34,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import org.jsoup.Connection.Response;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -115,29 +116,18 @@ public class PageParser {
 	}
 	
 	/**
-	 * Pase page
+	 * Parse html to list of legal doc
 	 * 
-	 * @param base base URL
-	 * @param type legal type
-	 * @param year year (1845 or later)
+	 * @param html HTML 
 	 * @param lang language code
-	 * @return list of legal docs
-	 * @throws MalformedURLException
+	 * @return
 	 * @throws IOException 
 	 */
-	public List<LegalDoc> parse(String base, String type, int year, String lang) 
-									throws MalformedURLException, IOException {
-		List<LegalDoc> l  = new ArrayList();
+	public List<LegalDoc> parse(String html, String lang) throws IOException {
+		List<LegalDoc> l = new ArrayList();
 		
-		String url = base + "/"+ type + "/" + year;
-		LOG.info("Using URL {}", url);
-
-		Document doc = Jsoup.connect(url).ignoreHttpErrors(true)
-							.execute().charset("ISO-8859-1").parse();
-		if (doc == null) {
-			throw new IOException();
-		}
-		
+		Document doc = Jsoup.parse(html);
+	
 		Elements rows = doc.select("tr");
 		for (Element row: rows) {
 			Element tdDesc = row.selectFirst("td:nth-child(2)");
@@ -158,5 +148,26 @@ public class PageParser {
 			l.add(legal);
 		}
 		return l;
+	}
+	
+	
+	/**
+	 * Get HTML page
+	 * 
+	 * @param base base URL
+	 * @param type legal type
+	 * @param year year (1831 or later)
+	 * @param lang language code
+	 * @return body of page
+	 * @throws IOException 
+	 */
+	public Document get(String base, String type, int year, String lang) throws IOException {	
+		String url = base + "/"+ type + "/" + year;
+		LOG.info("Using URL {}", url);
+
+		Document doc = Jsoup.connect(url).ignoreHttpErrors(true).execute()
+										.charset("ISO-8859-1").parse();
+		doc.body().attr("lang", lang);
+		return doc;
 	}
 }

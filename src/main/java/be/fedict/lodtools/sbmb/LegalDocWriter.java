@@ -72,11 +72,16 @@ public class LegalDocWriter {
 		LANGS.put("fr", F.createIRI("http://publications.europa.eu/resource/authority/language/FRA"));
 	}
 	
+	/**
+	 * Convert LocalDate to RDF4J value
+	 * 
+	 * @param d local date
+	 * @return Value
+	 */
 	private Value toDate(LocalDate d) {
 		if (d == null) {
 			return null;
 		}
-
 		Date date = Date.from(d.atStartOfDay(ZoneId.systemDefault()).toInstant());
 		return F.createLiteral(date);
 	}
@@ -90,7 +95,7 @@ public class LegalDocWriter {
 	 * @throws IOException 
 	 */
 	public void write(List<LegalDoc> docs, File outdir, int year) throws IOException {
-		Path p = Paths.get(outdir.toString(), "out" + year + ".nt");
+		Path p = Paths.get(outdir.toString(), "out-" + year + ".nt");
 		
 		
 		try (BufferedWriter w = Files.newBufferedWriter(p)) {

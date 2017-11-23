@@ -26,13 +26,15 @@
 
 package be.fedict.lodtools.sbmb;
 
-import be.fedict.lodtools.sbmb.helper.LegalDoc;
 
+import be.fedict.lodtools.sbmb.helper.LegalDoc;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 
 import org.apache.commons.cli.CommandLine;
@@ -40,6 +42,14 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
+import org.jsoup.Connection.Response;
+import org.jsoup.nodes.Document;
+
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.HTreeMap;
+import org.mapdb.Serializer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,17 +63,24 @@ import org.slf4j.LoggerFactory;
 public class Main {
 	private final static Logger LOG = LoggerFactory.getLogger(Main.class);
 	
+	private final static PageParser PARSER = new PageParser();
 	private final static Random RND = new Random();
 	
 	private final static Options OPTS = 
 			new Options().addRequiredOption("s", "start", true, "Start year")
 						.addRequiredOption("e", "end", true, "End year")
 						.addRequiredOption("b", "base", true, "Base URL")
-						.addRequiredOption("n", "nl", true, "Dutch type")
-						.addRequiredOption("f", "fr", true, "French type")
+						.addRequiredOption("n", "nl", true, "Dutch doc type")
+						.addRequiredOption("f", "fr", true, "French doc type")
+						.addRequiredOption("c", "cache", true, "Cache file")
+						.addOption("g", "get", false, "Get files from site")
+						.addOption("m", "month", true, "Month")
 						.addOption("o", "outdir", true, "Output directory")
 						.addOption("w", "wait", true, "Wait between requests");
 	
+	private static DB CACHE;
+	private static HTreeMap<String,String> MAP;
+
 	/**
 	 * Log message and exit with exit code
 	 * 
@@ -71,6 +88,10 @@ public class Main {
 	 * @param msg message to be logged
 	 */
 	private static void exit(int code, String msg) {
+		if (CACHE != null) {
+			CACHE.commit();
+			CACHE.close();
+		}
 		LOG.error(msg);
 		System.exit(code);
 	}
@@ -90,11 +111,90 @@ public class Main {
 			return null;
 		}
 	}
-
+	
+	/**
+	 * Get base URL
+	 * 
+	 * @param base
+	 * @return url as string 
+	 */
+	private static String getBase(String base) {
+		if (! base.startsWith("http")) {
+			base = "http://" + base;
+		}
+		LOG.info("Using base {}", base);
+		return base;
+	}
+	
+	/**
+	 * Sleep for a random time (between T and T * 2)
+	 * 
+	 * @param wait minimum sleep (in seconds)
+	 * @throws InterruptedException 
+	 */
 	private static void sleep(long wait) throws InterruptedException {
 		Thread.sleep(wait + ((long) RND.nextFloat() * wait));
 	}
+
+	/**
+	 * 
+	 * @param file
+	 */
+	private static  void getMap(String file) {
+		CACHE = DBMaker.fileDB(file).make();
+		MAP = CACHE.hashMap("sbmb", Serializer.STRING, Serializer.STRING).create();
+	}
 	
+	/**
+	 * Get pages 
+	 * @param start start year
+	 * @param end end year
+	 * @param base base URL
+	 * @param types types
+	 * @param wait delay between requests in seconds
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	private static void getPages(int start, int end, String base, Map<String,String> types, String wait) 
+									throws InterruptedException, IOException {
+		int w = Integer.valueOf(wait) * 1000;
+		
+		for(int year = start; year <= end; year++) {	
+			LOG.info("Get page for year {}", year);
+		
+			for(Entry<String,String> type: types.entrySet()) {
+				sleep(w);
+				Document page = PARSER.get(base, type.getValue(), year, type.getKey());
+				MAP.put(page.location(), page.body().html());
+			}
+		}
+	}
+	
+	/**
+	 * Write page to RDF file
+	 * 
+	 * @param start
+	 * @param end
+	 * @param outdir 
+	 * @throws IOException
+	 */
+	private static void writePages(int start, int end, String base, 
+					Map<String,String> types, String outdir) throws IOException {
+		File f = Paths.get(outdir).toFile();
+
+		LegalDocWriter w = new LegalDocWriter();
+		
+		for (int year = start; year <= end; year++) {	
+			LOG.info("Write docs for year {}", year);
+			
+			for(Entry<String,String> type: types.entrySet()) {
+				String html = MAP.get(base + "/" + type + "/" + year);
+				List<LegalDoc> docs = PARSER.parse(html, type.getKey());
+				w.write(docs, f, year);
+			}
+		}
+	}
+				
 	/**
 	 * Main
 	 * 
@@ -111,40 +211,24 @@ public class Main {
 		if (start == 0 || end == 0 || end < start) {
 			exit(-2, "Invalid start/end year combination");
 		}
+	
+		getMap(cli.getOptionValue("c"));	
 		
-		String base = cli.getOptionValue("b");
-		if (! base.startsWith("http")) {
-			base = "http://" + base;
-		}
-		LOG.info("Using base {}", base);
+		Map<String,String> types = new HashMap();
+		types.put("nl", cli.getOptionValue("n"));
+		types.put("fr", cli.getOptionValue("f"));
 		
-		String o = cli.getOptionValue("o", ".");
-		File outdir = Paths.get(o).toFile();
-		if (! outdir.canWrite()) {
-			exit(-3, "Can't write to output dir");
-		}
-		
-		int wait = Integer.valueOf(cli.getOptionValue("w", "6")) * 1000;
-		
-		PageParser pp = new PageParser();
-		List<LegalDoc> docs = new ArrayList();
-		
-		for (int year = start; year <= end; year++) {	
-			LOG.info("Year {}", year);
-			try {
-				sleep(wait);
-				docs.addAll(pp.parse(base, cli.getOptionValue("n"), year, "nl"));
-				
-				sleep(wait);
-				docs.addAll(pp.parse(base, cli.getOptionValue("f"), year, "fr"));
-				
-				LegalDocWriter w = new LegalDocWriter();
-				w.write(docs, outdir, year);
-			} catch (IOException ex) {
-				LOG.error(ex.getMessage());
-			} catch (InterruptedException ex) {
-				exit(-4, "Interrupted");
+		try {
+			String base = getBase(cli.getOptionValue("b"));
+			
+			if (cli.hasOption("g")) {
+				getPages(start, end, base, types, cli.getOptionValue("w"));
 			}
+			writePages(start, end, base, types, cli.getOptionValue("o", "."));
+		} catch (IOException ex) {
+			exit(-4, ex.getMessage());
+		} catch (InterruptedException ex) {
+			exit(-5, "Interrupted");
 		}
 	}	
 }
