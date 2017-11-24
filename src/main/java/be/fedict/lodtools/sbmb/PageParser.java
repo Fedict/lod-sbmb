@@ -52,10 +52,21 @@ import org.slf4j.LoggerFactory;
  */
 public class PageParser {
 	private final static Logger LOG = LoggerFactory.getLogger(PageParser.class);
-			
-	private LegalDoc parseDesc(Element td, LegalDoc doc, String lang) {
+	
+	/**
+	 * Parse description from overview page
+	 * 
+	 * @param td table cell
+	 * @param doc legal doc
+	 * @param lang language code
+	 * @return true on success
+	 */
+	private boolean parseDesc(Element td, LegalDoc doc, String lang) {
 		Element rawtitle = td.selectFirst("font");
-		
+		if (rawtitle == null) {
+			LOG.error("No title found");
+			return false;
+		}
 		String t = rawtitle.ownText();
 		LOG.info("Found {}", t);
 
@@ -64,7 +75,7 @@ public class PageParser {
 			split = t.split(". ", 2);
 			if (split.length < 2) {
 				LOG.error("Could not split title");
-				return doc;
+				return false;
 			}
 		}
 		String docstr = split[0];
@@ -91,21 +102,21 @@ public class PageParser {
 		}
 		String source = (srcel != null) ? srcel.ownText() : null;
 		doc.setDesc(docdate, title, pubdate, source);
-		return doc;
+		return true;
 	}
 	
 	/**
-	 * Parse links to Justel/MB in overview
+	 * Parse links to Justel/MB from overview
 	 * 
-	 * @param td
-	 * @param doc
-	 * @return 
+	 * @param td html table cell
+	 * @param doc legal document
+	 * @return true on success
 	 */
-	private LegalDoc parseLinks(Element td, LegalDoc doc) {
+	private boolean parseLinks(Element td, LegalDoc doc) {
 		Elements links = td.select("a");
 		if (links == null) {
 			LOG.error("No links found");
-			return doc;
+			return false;
 		}
 		for (Element link: links) {
 			try {
@@ -120,7 +131,7 @@ public class PageParser {
 				LOG.warn(ex.getMessage());
 			}
 		}
-		return doc;
+		return true;
 	}
 	
 	/**
@@ -145,7 +156,9 @@ public class PageParser {
 			LegalDoc legal = new LegalDoc();
 			legal.setLang(lang);
 			
-			parseDesc(tdDesc, legal, lang);
+			if (parseDesc(tdDesc, legal, lang) == false) {
+				continue;
+			}
 			
 			Element tdJust = row.selectFirst("td:nth-child(3)");
 			if (tdJust == null) {
