@@ -67,13 +67,13 @@ public class Main {
 	
 	private final static Options OPTS = 
 			new Options().addRequiredOption("s", "start", true, "Start year")
-						.addRequiredOption("e", "end", true, "End year")
+						.addOption("e", "end", true, "End year")
+						.addOption("m", "month", true, "Month")
 						.addRequiredOption("b", "base", true, "Base URL")
 						.addRequiredOption("n", "nl", true, "Dutch doc type")
 						.addRequiredOption("f", "fr", true, "French doc type")
 						.addOption("c", "cache", true, "Cache file")
 						.addOption("g", "get", false, "Get files from site")
-						.addOption("m", "month", true, "Month")
 						.addOption("o", "outdir", true, "Output directory")
 						.addOption("w", "wait", true, "Wait between requests");
 	
@@ -212,8 +212,11 @@ public class Main {
 		
 		int start = Integer.valueOf(cli.getOptionValue("s"));
 		int end = Integer.valueOf(cli.getOptionValue("e"));
-		if (start == 0 || end == 0 || end < start) {
-			exit(-2, "Invalid start/end year combination");
+		if (end < start) {
+			end = start;
+		} 
+		if (start < 1800) {
+			exit(-2, "Invalid start year");
 		}
 	
 		getMap(cli.getOptionValue("c", "cache"));	

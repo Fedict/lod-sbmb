@@ -35,7 +35,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
-import org.jsoup.Connection.Response;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -114,22 +113,26 @@ public class PageParser {
 	 */
 	private boolean parseLinks(Element td, LegalDoc doc) {
 		Elements links = td.select("a");
-		if (links == null) {
-			LOG.error("No links found");
+		if (links == null || links.isEmpty()) {
+			LOG.error("No links found {}", td.html());
 			return false;
 		}
 		for (Element link: links) {
 			try {
 				URL u = new URL(link.attr("href"));
-				if (link.ownText().trim().equals("Justel")) {
+				if (link.ownText().trim().startsWith("Justel")) {
 					doc.setId(u.toString().replaceAll("/justel", ""));
 					doc.setJustel(u);
 				} else {
 					doc.setSbmb(u);
 				}
 			} catch (MalformedURLException ex) {
-				LOG.warn(ex.getMessage());
+				LOG.error(ex.getMessage());
 			}
+		}
+		if (doc.getId() == null) {
+			LOG.error("No links found");
+			return false;			
 		}
 		return true;
 	}
@@ -163,8 +166,11 @@ public class PageParser {
 			Element tdJust = row.selectFirst("td:nth-child(3)");
 			if (tdJust == null) {
 				LOG.error("No third column found {}", row.html());
+				continue;
 			}
-			parseLinks(tdJust, legal);
+			if (parseLinks(tdJust, legal) == false) {
+				continue;
+			}
 			
 			l.add(legal);
 		}
