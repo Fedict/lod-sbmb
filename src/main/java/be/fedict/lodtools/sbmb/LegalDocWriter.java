@@ -89,30 +89,42 @@ public class LegalDocWriter {
 	/**
 	 * Write (titles of) legal documents to a file
 	 * 
-	 * @param docs
+	 * @param docs list of legaldocs
 	 * @param outdir output directory
-	 * @param year
+	 * @param year year
+	 * @param type
 	 * @throws IOException 
 	 */
-	public void write(List<LegalDoc> docs, File outdir, int year) throws IOException {
+	public void write(List<LegalDoc> docs, File outdir, int year, String type) throws IOException {
 		if (docs.isEmpty()) {
 			LOG.warn("Nothing to write for {}", year);
 			return;
 		} 
 		Path p = Paths.get(outdir.toString(), "out-" + year + ".nt");
+		IRI doctype = F.createIRI("http://vocab.belgif.be/legal-type/" + type + "#id");
 		
 		try (BufferedWriter w = Files.newBufferedWriter(p)) {
 			Model m = new LinkedHashModel();
 			for (LegalDoc doc: docs) {
+				String lang = doc.getLang();
+				
 				IRI id = F.createIRI(doc.getId());
 				IRI justel = F.createIRI(doc.getJustel().toString());
 				
 				m.add(id, RDF.TYPE, ELI.LEGAL_RESOURCE);
 				m.add(id, ELI.IS_REALISED_BY, justel);
+				m.add(id, ELI.TYPE_DOCUMENT, doctype);
+				
+				String source = doc.getSource();
+				if (source != null) {
+					m.add(id, ELI.RESPONSIBILITY_OF, F.createLiteral(source, lang));
+				}
+				
 				m.add(justel, RDF.TYPE, ELI.LEGAL_EXPRESSION);
 				m.add(justel, ELI.REALISES, id);
-				m.add(justel, ELI.LANGUAGE, LANGS.get(doc.getLang()));
-				m.add(justel, ELI.TITLE, F.createLiteral(doc.getTitle(), doc.getLang()));
+				m.add(justel, ELI.LANGUAGE, LANGS.get(lang));
+				m.add(justel, ELI.TITLE, F.createLiteral(doc.getTitle(), lang));
+				
 				Value docDate = toDate(doc.getDocDate());
 				if (docDate != null) {
 					m.add(justel, ELI.DATE_DOCUMENT, docDate);
@@ -121,6 +133,7 @@ public class LegalDocWriter {
 				if (pubDate != null) {
 					m.add(justel, ELI.DATE_PUBLICATION, pubDate);
 				}
+				m.add(justel, ELI.PUBLISHER_AGENT, SBMB);
 			}
 			Rio.write(m, w, RDFFormat.NTRIPLES);
 		}

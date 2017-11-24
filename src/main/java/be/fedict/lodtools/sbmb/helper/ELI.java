@@ -52,6 +52,7 @@ public class ELI {
 	public static final IRI PUBLISHER;
 	public static final IRI PUBLISHER_AGENT;
 	public static final IRI REALISES;
+	public static final IRI RESPONSIBILITY_OF;
 	public static final IRI TITLE;
 	public static final IRI TYPE_DOCUMENT;
 
@@ -72,6 +73,7 @@ public class ELI {
 		PUBLISHER = F.createIRI(NAMESPACE, "publisher");
 		PUBLISHER_AGENT = F.createIRI(NAMESPACE, "publisher_agent");
 		REALISES = F.createIRI(NAMESPACE, "realises");
+		RESPONSIBILITY_OF = F.createIRI(NAMESPACE, "responsibility_of");
 		TITLE = F.createIRI(NAMESPACE, "title");
 		TYPE_DOCUMENT = F.createIRI(NAMESPACE, "type_document");
 		

@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath be.fedict.lodtools.sbmb.Main -s 1831 -e 2017  -b http://www.ejustice.just.fgov.be/eli -n wet -f loi -o c:\data\sbmb\lw -w 10</exec.args>
+                <exec.args>-classpath %classpath be.fedict.lodtools.sbmb.Main -s 1800 -e 2017  -b http://www.ejustice.just.fgov.be/eli -t LAW -n wet -f loi -o c:\data\sbmb\law -w 10</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.workingdir>c:\data</exec.workingdir>
             </properties>
@@ -25,7 +25,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath be.fedict.lodtools.sbmb.Main -s 1831 -e 2017  -b http://www.ejustice.just.fgov.be/eli -n wet -f loi -o c:\data\sbmb\lw -w 10</exec.args>
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath be.fedict.lodtools.sbmb.Main -s 1800 -e 2017  -b http://www.ejustice.just.fgov.be/eli -t LAW -n wet -f loi -o c:\data\sbmb\law -w 10</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
                 <exec.workingdir>c:\data</exec.workingdir>
@@ -41,7 +41,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath be.fedict.lodtools.sbmb.Main -s 1831 -e 2017  -b http://www.ejustice.just.fgov.be/eli -n wet -f loi -o c:\data\sbmb\lw -w 10</exec.args>
+                <exec.args>-classpath %classpath be.fedict.lodtools.sbmb.Main -s 1800 -e 2017  -b http://www.ejustice.just.fgov.be/eli -t LAW -n wet -f loi -o c:\data\sbmb\law -w 10</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.workingdir>c:\data</exec.workingdir>
             </properties>

@@ -23,7 +23,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package be.fedict.lodtools.sbmb;
 
 import be.fedict.lodtools.sbmb.helper.LegalDoc;
@@ -71,6 +70,7 @@ public class Main {
 						.addRequiredOption("b", "base", true, "Base URL")
 						.addRequiredOption("n", "nl", true, "Dutch doc type")
 						.addRequiredOption("f", "fr", true, "French doc type")
+						.addRequiredOption("t", "type", true, "Type")
 						.addOption("c", "cache", true, "Cache file")
 						.addOption("g", "get", false, "Get files from site")
 						.addOption("o", "outdir", true, "Output directory")
@@ -136,8 +136,9 @@ public class Main {
 	}
 
 	/**
+	 * Get database cache file
 	 * 
-	 * @param file
+	 * @param file MapDB file
 	 */
 	private static  void getMap(String file) {
 		CACHE = DBMaker.fileDB(file).closeOnJvmShutdown().transactionEnable().make();
@@ -173,12 +174,15 @@ public class Main {
 	/**
 	 * Write page to RDF file
 	 * 
-	 * @param start
-	 * @param end
-	 * @param outdir 
+	 * @param start start year
+	 * @param end end year
+	 * @param base base URL
+	 * @param type
+	 * @param types map of types
+	 * @param outdir output dir
 	 * @throws IOException
 	 */
-	private static void writePages(int start, int end, String base, 
+	private static void writePages(int start, int end, String base, String type,
 					Map<String,String> types, String outdir) throws IOException {
 		File f = Paths.get(outdir).toFile();
 
@@ -187,13 +191,13 @@ public class Main {
 		for (int year = start; year <= end; year++) {	
 			LOG.info("Write docs for year {}", year);
 			
-			for(Entry<String,String> type: types.entrySet()) {
-				String html = MAP.get(base + "/" + type.getValue() + "/" + year);
+			for(Entry<String,String> e: types.entrySet()) {
+				String html = MAP.get(base + "/" + e.getValue() + "/" + year);
 				if (html == null ||html.isEmpty()) {
 					throw new IOException("Could not get page from cache");
 				}
-				List<LegalDoc> docs = PARSER.parse(html, type.getKey());
-				w.write(docs, f, year);
+				List<LegalDoc> docs = PARSER.parse(html, e.getKey());
+				w.write(docs, f, year, type);
 			}
 		}
 	}
@@ -230,7 +234,8 @@ public class Main {
 			if (cli.hasOption("g")) {
 				getPages(start, end, base, types, cli.getOptionValue("w"));
 			}
-			writePages(start, end, base, types, cli.getOptionValue("o", "."));
+			writePages(start, end, base, cli.getOptionValue("t"), types, 
+												cli.getOptionValue("o", "."));
 		} catch (IOException ex) {
 			exit(-4, ex.getMessage());
 		} catch (InterruptedException ex) {
