@@ -26,8 +26,8 @@
 
 package be.fedict.lodtools.sbmb;
 
-
 import be.fedict.lodtools.sbmb.helper.LegalDoc;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -52,7 +52,6 @@ import org.mapdb.Serializer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * Main class

@@ -67,7 +67,7 @@ public class PageParser {
 			return false;
 		}
 		String t = rawtitle.ownText();
-		LOG.info("Found {}", t);
+		LOG.debug("Found {}", t);
 
 		String[] split = t.split("\\.? [-_] ", 2);
 		if (split.length < 2) {

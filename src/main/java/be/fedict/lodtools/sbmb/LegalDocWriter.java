@@ -125,5 +125,4 @@ public class LegalDocWriter {
 			Rio.write(m, w, RDFFormat.NTRIPLES);
 		}
 	}
-
 }
