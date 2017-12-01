@@ -45,7 +45,9 @@ public class ELI {
 
 	public static final IRI DATE_DOCUMENT;
 	public static final IRI DATE_PUBLICATION;
+	public static final IRI EMBODIES;
 	public static final IRI FORMAT_PROP;
+	public static final IRI IS_EMBODIED_BY;
 	public static final IRI IS_REALISED_BY;
 	public static final IRI LANGUAGE;
 	public static final IRI LEGALVALUE;
@@ -66,7 +68,9 @@ public class ELI {
 		
 		DATE_DOCUMENT = F.createIRI(NAMESPACE, "date_document");
 		DATE_PUBLICATION = F.createIRI(NAMESPACE, "date_publication");
+		EMBODIES = F.createIRI(NAMESPACE, "embodies");
 		FORMAT_PROP = F.createIRI(NAMESPACE, "format");
+		IS_EMBODIED_BY = F.createIRI(NAMESPACE, "is_embodied_by");
 		IS_REALISED_BY = F.createIRI(NAMESPACE, "is_realised_by");
 		LANGUAGE = F.createIRI(NAMESPACE, "language");
 		LEGALVALUE = F.createIRI(NAMESPACE, "legal_value");

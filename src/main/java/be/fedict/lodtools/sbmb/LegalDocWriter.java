@@ -40,6 +40,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
@@ -47,6 +48,7 @@ import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.model.vocabulary.OWL;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
@@ -95,33 +97,47 @@ public class LegalDocWriter {
 	 * @param type
 	 * @throws IOException 
 	 */
-	public void write(List<LegalDoc> docs, File outdir, int year, String type) throws IOException {
+	public void write(List<LegalDoc> docs, File outdir, int year, String type, 
+								Map<String,String> types) throws IOException {
 		if (docs.isEmpty()) {
 			LOG.warn("Nothing to write for {}", year);
 			return;
 		} 
 		Path p = Paths.get(outdir.toString(), "out-" + year + ".nt");
 		IRI doctype = F.createIRI("http://vocab.belgif.be/legal-type/" + type + "#id");
+		IRI html = F.createIRI("http://www.iana.org/assignments/media-types/text/html");
 		
 		try (BufferedWriter w = Files.newBufferedWriter(p)) {
 			Model m = new LinkedHashModel();
 			for (LegalDoc doc: docs) {
-				String lang = doc.getLang();
 				
 				IRI id = F.createIRI(doc.getId());
 				IRI justel = F.createIRI(doc.getJustel().toString());
+				IRI format = F.createIRI(justel.toString() + "/html");
 				
+				// Legal Resource "abstract" IRI
 				m.add(id, RDF.TYPE, ELI.LEGAL_RESOURCE);
-				m.add(id, ELI.IS_REALISED_BY, justel);
 				m.add(id, ELI.TYPE_DOCUMENT, doctype);
 				
+				// Alias / sameas
+				String lang = doc.getLang();
+				String t = types.get(lang);
+				for (Entry<String,String> e: types.entrySet()) {
+					if (! e.getKey().equals(lang)) {
+						IRI same = F.createIRI(id.toString().replaceFirst(t, e.getValue()));
+						m.add(id, OWL.SAMEAS, same);
+					}
+				}
 				String source = doc.getSource();
 				if (source != null) {
 					m.add(id, ELI.RESPONSIBILITY_OF, F.createLiteral(source, lang));
 				}
 				
-				m.add(justel, RDF.TYPE, ELI.LEGAL_EXPRESSION);
+				m.add(id, ELI.IS_REALISED_BY, justel);
 				m.add(justel, ELI.REALISES, id);
+				
+				// Legal expression, i.e. Justel publication
+				m.add(justel, RDF.TYPE, ELI.LEGAL_EXPRESSION);
 				m.add(justel, ELI.LANGUAGE, LANGS.get(lang));
 				m.add(justel, ELI.TITLE, F.createLiteral(doc.getTitle(), lang));
 				
@@ -134,6 +150,12 @@ public class LegalDocWriter {
 					m.add(justel, ELI.DATE_PUBLICATION, pubDate);
 				}
 				m.add(justel, ELI.PUBLISHER_AGENT, SBMB);
+				
+				// Format, i.e. Justel as HTML
+				m.add(justel, ELI.IS_EMBODIED_BY, format);
+				m.add(format, ELI.EMBODIES, justel);
+				m.add(format, RDF.TYPE, ELI.FORMAT);
+				m.add(format, ELI.FORMAT_PROP, html);
 			}
 			Rio.write(m, w, RDFFormat.NTRIPLES);
 		}

@@ -35,6 +35,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -51,7 +53,9 @@ import org.slf4j.LoggerFactory;
  */
 public class PageParser {
 	private final static Logger LOG = LoggerFactory.getLogger(PageParser.class);
-	
+	private final static Pattern TITLE = 
+				Pattern.compile("^((\\d{1,2}|1er) [a-zA-Z]+ \\d{4})([ ._-]+)(.+)$");
+		
 	/**
 	 * Parse description from overview page
 	 * 
@@ -67,24 +71,30 @@ public class PageParser {
 			return false;
 		}
 		String t = rawtitle.ownText();
+		if (t.isEmpty()) {
+			LOG.error("Empty text for raw title {}", rawtitle);
+			return false;
+		}
 		LOG.debug("Found {}", t);
 
-		String[] split = t.split("\\.? [-_] ", 2);
-		if (split.length < 2) {
-			split = t.split(". ", 2);
-			if (split.length < 2) {
-				LOG.error("Could not split title");
-				return false;
-			}
+		String docstr = "";
+		String title = t;
+
+		Matcher m = TITLE.matcher(t);
+		if (m.matches() && m.groupCount() == 4) {
+			docstr = m.group(1);
+			title = m.group(4);
+		} else {
+			LOG.error("Could not split title {}", t);	
 		}
-		String docstr = split[0];
-		String title = split[1];
 		
 		LocalDate docdate = null;
-		try  {
-			docdate = DateParser.parseLong(docstr, lang);
-		} catch (DateTimeParseException ex) {
-			LOG.error("Could not parse doc date {}", ex.getMessage());
+		if (!docstr.isEmpty()) {
+			try  {
+				docdate = DateParser.parseLong(docstr, lang);
+			} catch (DateTimeParseException ex) {
+				LOG.error("Could not parse doc date {}", docstr);
+			}
 		}
 		
 		LocalDate pubdate = null;
@@ -121,7 +131,7 @@ public class PageParser {
 			try {
 				URL u = new URL(link.attr("href"));
 				if (link.ownText().trim().startsWith("Justel")) {
-					doc.setId(u.toString().replaceAll("/justel", ""));
+					doc.setId(u.toString().replaceFirst("/justel", ""));
 					doc.setJustel(u);
 				} else {
 					doc.setSbmb(u);

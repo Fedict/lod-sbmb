@@ -25,26 +25,13 @@
  */
 package be.fedict.lodtools.sbmb.helper;
 
-import be.fedict.lodtools.sbmb.*;
-import be.fedict.lodtools.sbmb.helper.LegalDoc;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.time.format.FormatStyle;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,9 +75,9 @@ public class DateParser {
 												throws DateTimeParseException{
 		String d = str.toLowerCase();
 		if (lang.equals("fr")) {
-			d = d.replaceFirst("fe", "fé")
-					.replaceFirst("ut", "ût")
-					.replaceFirst("de", "dé")
+			d = d.replaceFirst("fevrier", "février")
+					.replaceFirst("aout", "août")
+					.replaceFirst("decembre", "décembre")
 					.replaceFirst("1er", "1");
 		}
 		return LocalDate.parse(d, LONGS.get(lang));

@@ -197,7 +197,7 @@ public class Main {
 					throw new IOException("Could not get page from cache");
 				}
 				List<LegalDoc> docs = PARSER.parse(html, e.getKey());
-				w.write(docs, f, year, type);
+				w.write(docs, f, year, type, types);
 			}
 		}
 	}
@@ -224,6 +224,7 @@ public class Main {
 	
 		getMap(cli.getOptionValue("c", "cache"));	
 		
+		// Map language to (name of) types
 		Map<String,String> types = new HashMap();
 		types.put("nl", cli.getOptionValue("n"));
 		types.put("fr", cli.getOptionValue("f"));
