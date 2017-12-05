@@ -214,7 +214,7 @@ public class Main {
 	public static void main(String[] args) {
 		CommandLine cli = parseArgs(args);
 		if (cli == null) {
-			exit(-1, "Couldn't pase command line");
+			exit(-1, "Couldn't parse command line");
 		}
 		
 		int start = Integer.valueOf(cli.getOptionValue("s"));
