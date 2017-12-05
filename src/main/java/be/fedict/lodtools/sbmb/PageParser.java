@@ -41,6 +41,7 @@ import java.util.regex.Pattern;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
 import org.slf4j.Logger;
@@ -55,6 +56,7 @@ public class PageParser {
 	private final static Logger LOG = LoggerFactory.getLogger(PageParser.class);
 	private final static Pattern TITLE = 
 				Pattern.compile("^((\\d{1,2}|1er)\\.? [a-zA-Z]+ \\d{4})([ ._-]+)(.+)$");
+	private final static Whitelist SAFE = Whitelist.relaxed().addTags("font");
 		
 	/**
 	 * Parse description from overview page
@@ -158,7 +160,7 @@ public class PageParser {
 	public List<LegalDoc> parse(String html, String lang) throws IOException {
 		List<LegalDoc> l = new ArrayList();
 		
-		Document doc = Jsoup.parse(html);
+		Document doc = Jsoup.parse(Jsoup.clean(html, SAFE));
 	
 		Elements rows = doc.select("tr");
 		for (Element row: rows) {
