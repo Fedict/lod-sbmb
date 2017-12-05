@@ -29,13 +29,13 @@ import be.fedict.lodtools.sbmb.helper.ELI;
 import be.fedict.lodtools.sbmb.helper.LegalDoc;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -50,6 +50,7 @@ import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.OWL;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
+import org.eclipse.rdf4j.model.vocabulary.XMLSchema;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
 
@@ -84,15 +85,15 @@ public class LegalDocWriter {
 		if (d == null) {
 			return null;
 		}
-		Date date = Date.from(d.atStartOfDay(ZoneId.systemDefault()).toInstant());
-		return F.createLiteral(date);
+		String date= d.format(DateTimeFormatter.ISO_DATE);
+		return F.createLiteral(date, XMLSchema.DATE);
 	}
 	
 	/**
 	 * Write (titles of) legal documents to a file
 	 * 
 	 * @param docs list of legaldocs
-	 * @param outdir output directory
+	 * @param outfile output file
 	 * @param year year
 	 * @param type
 	 * @param types
