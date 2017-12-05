@@ -35,13 +35,13 @@ java -jar lod-sbmb.jar -g
 
 ## Ontology
 
-See also the [http://publications.europa.eu/mdr/eli/index.html](technical specifications page of the European Legislation Identifier)
+See also the [technical specifications page of the European Legislation Identifier](http://publications.europa.eu/mdr/eli/index.html)
 
 Note that Belgium uses _2_ URIs / ELIs for the same eli:LegalResource (French and Dutch). This tools 'links' them using owl:sameAs.
 
 ## Libraries
 
-Uses the [http://rdf4j.org](RDF4j) and [http://www.mapdb.org/](MapDB) open source libraries.
+Uses the [RDF4j](http://rdf4j.org) and [MapDB](http://www.mapdb.org/) open source libraries.
 
 
 
