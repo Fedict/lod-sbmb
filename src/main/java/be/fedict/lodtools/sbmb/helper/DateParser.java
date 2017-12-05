@@ -32,18 +32,12 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Date parser helper class
  * 
  * @author Bart.Hanssens
  */
 public class DateParser {
-	private final static Logger LOG = LoggerFactory.getLogger(DateParser.class);
-	
 	private final static DateTimeFormatter SHORT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 	private final static Map<String, DateTimeFormatter> LONGS = new HashMap<>();
 	

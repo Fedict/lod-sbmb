@@ -33,10 +33,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,8 +92,8 @@ public class LegalDocWriter {
 	 * @param docs list of legaldocs
 	 * @param outfile output file
 	 * @param year year
-	 * @param type
-	 * @param types
+	 * @param type common type
+	 * @param types language-specific types
 	 * @throws IOException 
 	 */
 	public void write(List<LegalDoc> docs, Path outfile, int year, String type, 

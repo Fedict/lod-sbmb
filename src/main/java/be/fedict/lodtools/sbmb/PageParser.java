@@ -148,11 +148,11 @@ public class PageParser {
 	}
 	
 	/**
-	 * Parse html to list of legal doc
+	 * Convert html pages to a list of legal doc
 	 * 
-	 * @param html HTML 
+	 * @param html HTML
 	 * @param lang language code
-	 * @return
+	 * @return list of legal docs
 	 * @throws IOException 
 	 */
 	public List<LegalDoc> parse(String html, String lang) throws IOException {
@@ -193,7 +193,7 @@ public class PageParser {
 	 * 
 	 * @param base base URL
 	 * @param type legal type
-	 * @param year year (1831 or later)
+	 * @param year year (1800 or later)
 	 * @param lang language code
 	 * @return body of page
 	 * @throws IOException 

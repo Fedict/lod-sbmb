@@ -43,65 +43,146 @@ public class LegalDoc {
 	private LocalDate pubDate;
 	private LocalDate docDate;
 
+	/**
+	 * Get identifier
+	 * 
+	 * @return identifier
+	 */
 	public String getId() {
 		return id;
 	}
 
+	/**
+	 * Set identifier
+	 * 
+	 * @param id identifier 
+	 */
 	public void setId(String id) {
 		this.id = id;
 	}
 
+	/**
+	 * Get title
+	 * 
+	 * @return title
+	 */
 	public String getTitle() {
 		return title;
 	}
 
+	/**
+	 * Set title
+	 * 
+	 * @param title title
+	 */
 	public void setTitle(String title) {
 		this.title = title;
 	}
 	
+	/**
+	 * Get language code
+	 * 
+	 * @return language code
+	 */
 	public String getLang() {
 		return lang;
 	}
 
+	/**
+	 * Set language code
+	 * 
+	 * @param lang language code
+	 */
 	public void setLang(String lang) {
 		this.lang = lang;
 	}
+	
+	/**
+	 * Get source of document (ministry, parliament...)
+	 * 
+	 * @return source 
+	 */
 	public String getSource() {
 		return source;
 	}
 
+	/**
+	 * Set source of document (ministry, parliament...)
+	 * 
+	 * @param source source
+	 */
 	public void setSource(String source) {
 		this.source = source;
 	}
 
+	/**
+	 * Get link to publication in SB/MB
+	 * 
+	 * @return URL 
+	 */
 	public URL getSbmb() {
 		return sbmb;
 	}
 
+	/**
+	 * Set link to publication in SB/MB
+	 * 
+	 * @param sbmb URL
+	 */
 	public void setSbmb(URL sbmb) {
 		this.sbmb = sbmb;
 	}
 
+	/**
+	 * Get link to publication in Justel
+	 * 
+	 * @return URL
+	 */
 	public URL getJustel() {
 		return justel;
 	}
 
+	/**
+	 * Set link to publication in Justel
+	 * 
+	 * @param justel URL
+	 */
 	public void setJustel(URL justel) {
 		this.justel = justel;
 	}
 
+	/**
+	 * Get publication date
+	 * 
+	 * @return date
+	 */
 	public LocalDate getPubDate() {
 		return pubDate;
 	}
 
+	/**
+	 * Set publication date
+	 * 
+	 * @param pubDate date
+	 */
 	public void setPubDate(LocalDate pubDate) {
 		this.pubDate = pubDate;
 	}
 
+	/**
+	 * Get document approval date
+	 * 
+	 * @return date 
+	 */
 	public LocalDate getDocDate() {
 		return docDate;
 	}
 
+	/**
+	 * Set document approval date
+	 * 
+	 * @param docDate date
+	 */
 	public void setDocDate(LocalDate docDate) {
 		this.docDate = docDate;
 	}
