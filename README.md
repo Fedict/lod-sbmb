@@ -35,7 +35,7 @@ java -jar lod-sbmb.jar -g
 
 ## Ontology
 
-See also the[http://publications.europa.eu/mdr/eli/index.html](technical specifications page of the European Legislation Identifier)
+See also the [http://publications.europa.eu/mdr/eli/index.html](technical specifications page of the European Legislation Identifier)
 
 Note that Belgium uses _2_ URIs / ELIs for the same eli:LegalResource (French and Dutch). This tools 'links' them using owl:sameAs.
 
