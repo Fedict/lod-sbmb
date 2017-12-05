@@ -29,6 +29,7 @@ import be.fedict.lodtools.sbmb.helper.ELI;
 import be.fedict.lodtools.sbmb.helper.LegalDoc;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -104,6 +105,11 @@ public class LegalDocWriter {
 		} 
 		IRI doctype = F.createIRI("http://vocab.belgif.be/legal-type/" + type + "#id");
 		IRI html = F.createIRI("http://www.iana.org/assignments/media-types/text/html");
+		
+		File dir = outfile.getParent().toFile();
+		if (!dir.exists() && !dir.mkdirs()) {
+			LOG.error("Directory {} not writable", dir);
+		}
 
 		try (BufferedWriter w = Files.newBufferedWriter(outfile)) {
 			Model m = new LinkedHashModel();
