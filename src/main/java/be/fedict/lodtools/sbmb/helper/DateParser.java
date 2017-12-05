@@ -73,7 +73,7 @@ public class DateParser {
 	 */
 	public static LocalDate parseLong(String str, String lang) 
 												throws DateTimeParseException{
-		String d = str.toLowerCase();
+		String d = str.toLowerCase().replaceAll("\\.", "");
 		if (lang.equals("fr")) {
 			d = d.replaceFirst("fevrier", "février")
 					.replaceFirst("aout", "août")

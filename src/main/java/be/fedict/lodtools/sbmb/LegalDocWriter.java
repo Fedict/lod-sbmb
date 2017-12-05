@@ -95,22 +95,21 @@ public class LegalDocWriter {
 	 * @param outdir output directory
 	 * @param year year
 	 * @param type
+	 * @param types
 	 * @throws IOException 
 	 */
-	public void write(List<LegalDoc> docs, File outdir, int year, String type, 
+	public void write(List<LegalDoc> docs, Path outfile, int year, String type, 
 								Map<String,String> types) throws IOException {
 		if (docs.isEmpty()) {
 			LOG.warn("Nothing to write for {}", year);
 			return;
 		} 
-		Path p = Paths.get(outdir.toString(), "out-" + year + ".nt");
 		IRI doctype = F.createIRI("http://vocab.belgif.be/legal-type/" + type + "#id");
 		IRI html = F.createIRI("http://www.iana.org/assignments/media-types/text/html");
-		
-		try (BufferedWriter w = Files.newBufferedWriter(p)) {
+
+		try (BufferedWriter w = Files.newBufferedWriter(outfile)) {
 			Model m = new LinkedHashModel();
 			for (LegalDoc doc: docs) {
-				
 				IRI id = F.createIRI(doc.getId());
 				IRI justel = F.createIRI(doc.getJustel().toString());
 				IRI format = F.createIRI(justel.toString() + "/html");

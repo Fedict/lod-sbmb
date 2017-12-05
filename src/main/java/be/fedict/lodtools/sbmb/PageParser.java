@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
 public class PageParser {
 	private final static Logger LOG = LoggerFactory.getLogger(PageParser.class);
 	private final static Pattern TITLE = 
-				Pattern.compile("^((\\d{1,2}|1er) [a-zA-Z]+ \\d{4})([ ._-]+)(.+)$");
+				Pattern.compile("^((\\d{1,2}|1er)\\.? [a-zA-Z]+ \\d{4})([ ._-]+)(.+)$");
 		
 	/**
 	 * Parse description from overview page

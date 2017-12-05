@@ -29,6 +29,7 @@ import be.fedict.lodtools.sbmb.helper.LegalDoc;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
@@ -184,20 +185,23 @@ public class Main {
 	 */
 	private static void writePages(int start, int end, String base, String type,
 					Map<String,String> types, String outdir) throws IOException {
-		File f = Paths.get(outdir).toFile();
-
 		LegalDocWriter w = new LegalDocWriter();
 		
 		for (int year = start; year <= end; year++) {	
-			LOG.info("Write docs for year {}", year);
-			
 			for(Entry<String,String> e: types.entrySet()) {
-				String html = MAP.get(base + "/" + e.getValue() + "/" + year);
+				String lang = e.getKey();
+				String doctype = e.getValue();
+				
+				String html = MAP.get(base + "/" + doctype + "/" + year);
 				if (html == null ||html.isEmpty()) {
 					throw new IOException("Could not get page from cache");
 				}
-				List<LegalDoc> docs = PARSER.parse(html, e.getKey());
-				w.write(docs, f, year, type, types);
+				List<LegalDoc> docs = PARSER.parse(html, lang);
+				Path outfile = Paths.get(outdir, doctype + "-" + year + ".nt");
+				
+				LOG.info("Writing docs to file {}", outfile);
+			
+				w.write(docs, outfile, year, type, types);
 			}
 		}
 	}
