@@ -85,7 +85,7 @@ public class PageParser {
 			docstr = m.group(1);
 			title = m.group(4);
 		} else {
-			LOG.error("Could not split title {}", t);	
+			LOG.error("Could not split title {}", t);
 		}
 		
 		LocalDate docdate = null;
@@ -107,7 +107,7 @@ public class PageParser {
 		
 		Element srcel = rawtitle.selectFirst("font font font b font");
 		if (srcel == null) {
-			LOG.warn("No publication source found");
+			LOG.warn("No publication source found for {}", t);
 		}
 		String source = (srcel != null) ? srcel.ownText() : null;
 		doc.setDesc(docdate, title, pubdate, source);
