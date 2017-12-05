@@ -218,11 +218,10 @@ public class Main {
 		}
 		
 		int start = Integer.valueOf(cli.getOptionValue("s"));
-		int end = Integer.valueOf(cli.getOptionValue("e"));
-		if (end < start) {
-			end = start;
-		} 
-		if (start < 1800) {
+		int end = cli.hasOption("e") ? Integer.valueOf(cli.getOptionValue("e")) 
+									: start;
+
+		if (start < 1800 || start > end) {
 			exit(-2, "Invalid start year");
 		}
 	
