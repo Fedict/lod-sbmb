@@ -111,7 +111,11 @@ public class DateParser {
 				if (! alt.equals(lang) && date == null) {
 					LOG.warn("Couldn't parse {} in {}, trying {}", str, lang, alt);
 					// fallback 
-					date = parseLongLocale(str, alt);
+					try {
+						date = parseLongLocale(str, alt);
+					} catch (DateTimeParseException dte2) {
+						//
+					}
 				}
 			}
 		}
