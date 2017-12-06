@@ -32,12 +32,17 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Date parser helper class
  * 
  * @author Bart.Hanssens
  */
 public class DateParser {
+	private final static Logger LOG = LoggerFactory.getLogger(DateParser.class);
+	
 	private final static DateTimeFormatter SHORT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 	private final static Map<String, DateTimeFormatter> LONGS = new HashMap<>();
 	
@@ -50,24 +55,32 @@ public class DateParser {
 	 * Parse short date string to LocalDate
 	 * 
 	 * @param str
-	 * @return
-	 * @throws DateTimeParseException 
+	 * @return local date or null
 	 */
-	public static LocalDate parseShort(String str) throws DateTimeParseException {
-		return LocalDate.parse(str, SHORT);
+	public static LocalDate parseShort(String str) {
+		if (str == null) {
+			return null;
+		}
+		
+		try {
+			return LocalDate.parse(str, SHORT);
+		} catch (DateTimeParseException dte) {
+			return null;
+		}
 	}
 	
 	/**
 	 * Parse long date string to LocalDate
 	 * 
 	 * @param str string to parse
-	 * @param lang language code
+	 * @param lang language/locale code
 	 * @return local date
 	 * @throws DateTimeParseException 
 	 */
-	public static LocalDate parseLong(String str, String lang) 
+	private static LocalDate parseLongLocale(String str, String lang) 
 												throws DateTimeParseException{
 		String d = str.toLowerCase().replaceAll("\\.", "");
+		
 		if (lang.equals("fr")) {
 			d = d.replaceFirst("fevrier", "février")
 					.replaceFirst("aout", "août")
@@ -76,4 +89,33 @@ public class DateParser {
 		}
 		return LocalDate.parse(d, LONGS.get(lang));
 	}
+	
+	/**
+	 * Parse long date string to LocalDate
+	 * 
+	 * @param str string to parse
+	 * @param lang language code guess
+	 * @return local date or null
+	 */
+	public static LocalDate parseLong(String str, String lang) {
+		if (str == null || lang == null) {
+			return null;
+		}
+		
+		LocalDate date = null;
+		
+		try {
+			date = parseLongLocale(str, lang);
+		} catch (DateTimeParseException dte) {
+			for(String alt: LONGS.keySet()) {
+				if (! alt.equals(lang) && date == null) {
+					LOG.warn("Couldn't parse {} in {}, trying {}", str, lang, alt);
+					// fallback 
+					date = parseLongLocale(str, alt);
+				}
+			}
+		}
+		return date;
+	}
+	
 }

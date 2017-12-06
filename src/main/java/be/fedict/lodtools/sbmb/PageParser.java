@@ -90,21 +90,15 @@ public class PageParser {
 			LOG.error("Could not split title {}", t);
 		}
 		
-		LocalDate docdate = null;
-		if (!docstr.isEmpty()) {
-			try  {
-				docdate = DateParser.parseLong(docstr, lang);
-			} catch (DateTimeParseException ex) {
-				LOG.error("Could not parse doc date {}", docstr);
-			}
+		LocalDate docdate = DateParser.parseLong(docstr, lang);
+		if (docdate == null) {
+			LOG.error("Could not parse doc date {}", docstr);
 		}
 		
-		LocalDate pubdate = null;
 		Element pubel = rawtitle.selectFirst("font b font");
-		try  {
-			pubdate = DateParser.parseShort(pubel.ownText());
-		} catch (DateTimeParseException ex) {
-			LOG.error("Could not parse pub date {}", ex.getMessage());
+		LocalDate pubdate = DateParser.parseShort(pubel.ownText());
+		if (pubdate == null) {
+			LOG.error("Could not parse pub date {}", pubel.ownText());
 		}
 		
 		Element srcel = rawtitle.selectFirst("font font font b font");
