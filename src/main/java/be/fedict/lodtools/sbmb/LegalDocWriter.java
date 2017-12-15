@@ -103,7 +103,7 @@ public class LegalDocWriter {
 			LOG.warn("Nothing to write for {}", year);
 			return;
 		} 
-		IRI doctype = F.createIRI("http://vocab.belgif.be/legal-type/" + type + "#id");
+		IRI doctype = F.createIRI("http://vocab.belgif.be/auth/legal-type/" + type + "#id");
 		IRI html = F.createIRI("http://www.iana.org/assignments/media-types/text/html");
 		
 		File dir = outfile.getParent().toFile();
