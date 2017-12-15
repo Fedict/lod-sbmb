@@ -122,6 +122,16 @@ public class LegalDocWriter {
 				m.add(id, RDF.TYPE, ELI.LEGAL_RESOURCE);
 				m.add(id, ELI.TYPE_DOCUMENT, doctype);
 				
+				// doc and publication date are on "abstract" LegalResource level
+				Value docDate = toDate(doc.getDocDate());
+				if (docDate != null) {
+					m.add(id, ELI.DATE_DOCUMENT, docDate);
+				}
+				Value pubDate = toDate(doc.getPubDate());
+				if (pubDate != null) {
+					m.add(id, ELI.DATE_PUBLICATION, pubDate);
+				}
+				
 				// Alias / sameas
 				String lang = doc.getLang();
 				String t = types.get(lang);
@@ -144,14 +154,7 @@ public class LegalDocWriter {
 				m.add(justel, ELI.LANGUAGE, LANGS.get(lang));
 				m.add(justel, ELI.TITLE, F.createLiteral(doc.getTitle(), lang));
 				
-				Value docDate = toDate(doc.getDocDate());
-				if (docDate != null) {
-					m.add(justel, ELI.DATE_DOCUMENT, docDate);
-				}
-				Value pubDate = toDate(doc.getPubDate());
-				if (pubDate != null) {
-					m.add(justel, ELI.DATE_PUBLICATION, pubDate);
-				}
+				
 				m.add(justel, ELI.PUBLISHER_AGENT, SBMB);
 				
 				// Format, i.e. Justel as HTML
