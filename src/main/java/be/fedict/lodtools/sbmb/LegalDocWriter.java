@@ -146,8 +146,8 @@ public class LegalDocWriter {
 					m.add(id, ELI.RESPONSIBILITY_OF, F.createLiteral(source, lang));
 				}
 				
-				m.add(id, ELI.IS_REALISED_BY, justel);
-				m.add(justel, ELI.REALISES, id);
+				m.add(id, ELI.IS_REALIZED_BY, justel);
+				m.add(justel, ELI.REALIZES, id);
 				
 				// Legal expression, i.e. Justel publication
 				m.add(justel, RDF.TYPE, ELI.LEGAL_EXPRESSION);
