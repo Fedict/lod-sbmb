@@ -1,4 +1,4 @@
-# Staatsblad/Moniteur Belge linked data
+# SB/MB linked data
 
 
 > Converting titles of the Belgian Official Journal
@@ -40,6 +40,15 @@ http://www.ejustice.just.fgov.be/eli/wet/2017/02/09/2017029171
 - Java open source
     - [RDF4J](http://rdf4j.org/), [JSoup](https://jsoup.org/)
 - Small bash scripts and cron job
+
+---
+
+## How it works
+
+- SB/MB publishes daily lists of titles
+- Scraper tool converts them to RDF
+- Script sends zipped files to upload tool
+- Data is loaded into OntoText GraphDB
 
 ---
 
