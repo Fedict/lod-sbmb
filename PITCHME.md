@@ -58,6 +58,14 @@ http://www.ejustice.just.fgov.be/eli/wet/2017/02/09/2017029171
 - Script sends zipped files to upload tool
 - Data is loaded into OntoText GraphDB
 
+++
+
+## Limitation
+
+- Legislation itself is not linked data
+  - Requires more processing or change legacy system
+
+
 ---
 
 ## Thank you
