@@ -12,7 +12,7 @@
   - Laws, decrees...
 - Unique identifiers + [RDF ontology](http://publications.europa.eu/mdr/eli/index.html)
 
-@fa[exclamation-triangle] Belgium issues a NL and FR URI
+@fa[exclamation-triangle] Belgium issues both a NL and FR URI
 
 ---
 
@@ -20,9 +20,17 @@
 
 URIs for core concepts:
 
-- LegalResource
-- LegalExpression
-- Format
+- LegalResource: the legal "thing"
+- LegalExpression: specific version and/or language
+- Format: paper, XML, PDF.. edition of Expression
+
++++
+
+## Additional info
+
+
+- ELI [Implementation guide](https://publications.europa.eu/documents/2050822/2138819/ELI+-+A+Technical+Implementation+Guide.pdf)
+- SB/MB [help on ELI](http://www.ejustice.just.fgov.be/eli)
 
 ---
 
