@@ -203,10 +203,12 @@ public class PageParser {
 		String url = base + "/" + type + "/" + year;
 		LOG.info("Using URL {}", url);
 
-		Document doc = Jsoup.connect(url).ignoreHttpErrors(true).timeout(60 * 1000)
+		Document doc = Jsoup.connect(url).ignoreHttpErrors(true)
+							.timeout(60_000).maxBodySize(8_000_000)
 							.execute()
 							.charset("ISO-8859-1").parse();
 		doc.body().attr("lang", lang);
+		System.err.println(doc);
 		return doc;
 	}
 }
