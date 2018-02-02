@@ -49,18 +49,19 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Parse overview page
- * 
+ *
  * @author Bart.Hanssens
  */
 public class PageParser {
+
 	private final static Logger LOG = LoggerFactory.getLogger(PageParser.class);
-	private final static Pattern TITLE = 
-				Pattern.compile("^((\\d{1,2}|1er)\\.? [a-zA-Z]+ \\d{4})([ ._-]+)(.+)$");
+	private final static Pattern TITLE
+		= Pattern.compile("^((\\d{1,2}|1er)\\.? [a-zA-Z]+ \\d{4})([ ._-]+)(.+)$");
 	private final static Whitelist SAFE = Whitelist.relaxed().addTags("font");
-		
+
 	/**
 	 * Parse description from overview page
-	 * 
+	 *
 	 * @param td table cell
 	 * @param doc legal doc
 	 * @param lang language code
@@ -89,18 +90,23 @@ public class PageParser {
 		} else {
 			LOG.error("Could not split title {}", t);
 		}
-		
+
 		LocalDate docdate = DateParser.parseLong(docstr, lang);
 		if (docdate == null) {
 			LOG.error("Could not parse doc date {}", docstr);
 		}
-		
+
 		Element pubel = rawtitle.selectFirst("font b font");
+		if (pubel == null) {
+			LOG.error("No publication element found");
+			return false;
+		}
+		
 		LocalDate pubdate = DateParser.parseShort(pubel.ownText());
 		if (pubdate == null) {
 			LOG.error("Could not parse pub date {}", pubel.ownText());
 		}
-		
+
 		Element srcel = rawtitle.selectFirst("font font font b font");
 		if (srcel == null) {
 			LOG.warn("No publication source found for {}", t);
@@ -109,10 +115,10 @@ public class PageParser {
 		doc.setDesc(docdate, title, pubdate, source);
 		return true;
 	}
-	
+
 	/**
 	 * Parse links to Justel/MB from overview
-	 * 
+	 *
 	 * @param td html table cell
 	 * @param doc legal document
 	 * @return true on success
@@ -123,7 +129,7 @@ public class PageParser {
 			LOG.error("No links found {}", td.html());
 			return false;
 		}
-		for (Element link: links) {
+		for (Element link : links) {
 			try {
 				URL u = new URL(link.attr("href"));
 				if (link.ownText().trim().startsWith("Justel")) {
@@ -138,37 +144,37 @@ public class PageParser {
 		}
 		if (doc.getId() == null) {
 			LOG.error("No links found");
-			return false;			
+			return false;
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Convert html pages to a list of legal doc
-	 * 
+	 *
 	 * @param html HTML
 	 * @param lang language code
 	 * @return list of legal docs
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public List<LegalDoc> parse(String html, String lang) throws IOException {
 		List<LegalDoc> l = new ArrayList();
-		
+
 		Document doc = Jsoup.parse(Jsoup.clean(html, SAFE));
-	
+
 		Elements rows = doc.select("tr");
-		for (Element row: rows) {
+		for (Element row : rows) {
 			Element tdDesc = row.selectFirst("td:nth-child(2)");
 			if (tdDesc == null) { // row separator
 				continue;
 			}
 			LegalDoc legal = new LegalDoc();
 			legal.setLang(lang);
-			
+
 			if (parseDesc(tdDesc, legal, lang) == false) {
 				continue;
 			}
-			
+
 			Element tdJust = row.selectFirst("td:nth-child(3)");
 			if (tdJust == null) {
 				LOG.error("No third column found {}", row.html());
@@ -177,29 +183,29 @@ public class PageParser {
 			if (parseLinks(tdJust, legal) == false) {
 				continue;
 			}
-			
+
 			l.add(legal);
 		}
 		return l;
 	}
-	
-	
+
 	/**
 	 * Get HTML page
-	 * 
+	 *
 	 * @param base base URL
 	 * @param type legal type
 	 * @param year year (1800 or later)
 	 * @param lang language code
 	 * @return body of page
-	 * @throws IOException 
+	 * @throws IOException
 	 */
-	public Document get(String base, String type, int year, String lang) throws IOException {	
-		String url = base + "/"+ type + "/" + year;
+	public Document get(String base, String type, int year, String lang) throws IOException {
+		String url = base + "/" + type + "/" + year;
 		LOG.info("Using URL {}", url);
 
-		Document doc = Jsoup.connect(url).ignoreHttpErrors(true).execute()
-										.charset("ISO-8859-1").parse();
+		Document doc = Jsoup.connect(url).ignoreHttpErrors(true).timeout(60 * 1000)
+							.execute()
+							.charset("ISO-8859-1").parse();
 		doc.body().attr("lang", lang);
 		return doc;
 	}

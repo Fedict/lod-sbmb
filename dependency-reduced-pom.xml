@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>be.fedict.lodtools</groupId>
   <artifactId>lod-sbmb</artifactId>
-  <version>1.0.7</version>
+  <version>1.0.8</version>
   <description>Tool for converting Belgian Staatsblad / Moniteur belge titles to linked data</description>
   <build>
     <plugins>
