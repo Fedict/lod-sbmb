@@ -208,7 +208,6 @@ public class PageParser {
 							.execute()
 							.charset("ISO-8859-1").parse();
 		doc.body().attr("lang", lang);
-		System.err.println(doc);
 		return doc;
 	}
 }
