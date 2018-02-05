@@ -204,7 +204,7 @@ public class PageParser {
 		LOG.info("Using URL {}", url);
 
 		Document doc = Jsoup.connect(url).ignoreHttpErrors(true)
-							.timeout(60_000).maxBodySize(8_000_000)
+							.timeout(90_000).maxBodySize(8_000_000)
 							.execute()
 							.charset("ISO-8859-1").parse();
 		doc.body().attr("lang", lang);

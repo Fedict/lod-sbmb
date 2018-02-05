@@ -27,7 +27,6 @@ package be.fedict.lodtools.sbmb;
 
 import be.fedict.lodtools.sbmb.helper.LegalDoc;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
