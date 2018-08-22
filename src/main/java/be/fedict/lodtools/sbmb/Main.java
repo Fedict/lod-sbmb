@@ -193,18 +193,18 @@ public class Main {
 				String doctype = e.getValue();
 				
 				String html = MAP.get(base + "/" + doctype + "/" + year);
-				if (html == null ||html.isEmpty()) {
-					throw new IOException("Could not get page from cache");
+				if (html == null || html.isEmpty()) {
+					throw new IOException("Could not get " + doctype + "/" + year + " from cache");
 				}
 				List<LegalDoc> docs = PARSER.parse(html, lang);
+				
 				Path rdfOut = Paths.get(outdir, doctype + "-" + year + ".nt");
 				LOG.info("Writing docs to file {}", rdfOut);
+				rdf.write(docs, rdfOut, year, type, types);
+				
 				Path csvOut = Paths.get(outdir, doctype + "-" + year + ".csv");			
 				LOG.info("Writing docs to file {}", csvOut);
-			
-				rdf.write(docs, rdfOut, year, type, types);
-				rdf.write(docs, csvOut, year, type, types);
-			
+				csv.write(docs, csvOut, year, type, types);
 			}
 		}
 	}
