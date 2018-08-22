@@ -26,18 +26,41 @@
 package be.fedict.lodtools.sbmb;
 
 import be.fedict.lodtools.sbmb.helper.LegalDoc;
+import com.opencsv.CSVWriter;
 
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Writer legaldoc objects to file system.
  * 
  * @author Bart.Hanssens
  */
-public interface LegalDocWriter {
+public class LegalDocWriterCSV implements LegalDocWriter {
+	private final static Logger LOG = LoggerFactory.getLogger(LegalDocWriterCSV.class);
+	
+	/**
+	 * Convert LocalDate to date value
+	 * 
+	 * @param d local date
+	 * @return string
+	 */
+	private String toDate(LocalDate d) {
+		if (d == null) {
+			return null;
+		}
+		return d.format(DateTimeFormatter.ISO_DATE);
+	}
 	
 	/**
 	 * Write (titles of) legal documents to a file
@@ -49,6 +72,34 @@ public interface LegalDocWriter {
 	 * @param types language-specific types
 	 * @throws IOException 
 	 */
+	@Override
 	public void write(List<LegalDoc> docs, Path outfile, int year, String type, 
-								Map<String,String> types) throws IOException;
+								Map<String,String> types) throws IOException {
+		if (docs.isEmpty()) {
+			LOG.warn("Nothing to write for {}", year);
+			return;
+		} 
+		
+		File dir = outfile.getParent().toFile();
+		if (!dir.exists() && !dir.mkdirs()) {
+			LOG.error("Directory {} not writable", dir);
+		}
+
+		try (BufferedWriter w = Files.newBufferedWriter(outfile);
+			CSVWriter csv = new CSVWriter(w)) {
+			
+			String[] header = { "ID", "JUSTEL", "DOCTYPE", 
+								"DOCDATE", "PUBDATE", "LANG", 
+								"TYPE" , "SOURCE", "TITLE" };	
+			csv.writeNext(header);
+			
+			for (LegalDoc doc: docs) {
+				String[] row = {
+					doc.getId(), doc.getJustel().toString(), type,
+					toDate(doc.getDocDate()), toDate(doc.getPubDate()), doc.getLang(),
+					types.get(doc.getLang()), doc.getSource(), doc.getTitle() };
+				csv.writeNext(row);
+			}
+		}
+	}
 }

@@ -172,7 +172,7 @@ public class Main {
 	}
 	
 	/**
-	 * Write page to RDF file
+	 * Write page to RDF and CSV file
 	 * 
 	 * @param start start year
 	 * @param end end year
@@ -184,8 +184,9 @@ public class Main {
 	 */
 	private static void writePages(int start, int end, String base, String type,
 					Map<String,String> types, String outdir) throws IOException {
-		LegalDocWriter w = new LegalDocWriter();
-		
+		LegalDocWriter rdf = new LegalDocWriterRDF();
+		LegalDocWriter csv = new LegalDocWriterCSV();
+				
 		for (int year = start; year <= end; year++) {	
 			for(Entry<String,String> e: types.entrySet()) {
 				String lang = e.getKey();
@@ -196,11 +197,14 @@ public class Main {
 					throw new IOException("Could not get page from cache");
 				}
 				List<LegalDoc> docs = PARSER.parse(html, lang);
-				Path outfile = Paths.get(outdir, doctype + "-" + year + ".nt");
-				
-				LOG.info("Writing docs to file {}", outfile);
+				Path rdfOut = Paths.get(outdir, doctype + "-" + year + ".nt");
+				LOG.info("Writing docs to file {}", rdfOut);
+				Path csvOut = Paths.get(outdir, doctype + "-" + year + ".csv");			
+				LOG.info("Writing docs to file {}", csvOut);
 			
-				w.write(docs, outfile, year, type, types);
+				rdf.write(docs, rdfOut, year, type, types);
+				rdf.write(docs, csvOut, year, type, types);
+			
 			}
 		}
 	}
