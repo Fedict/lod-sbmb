@@ -33,6 +33,25 @@ java -jar lod-sbmb.jar -g
                       -o out/law
 ```
 
+### Docker
+ 
+ A `Dockerfile` is included to allow for Docker-based deployment.  
+ 
+ Building the image:
+ ```
+ docker build -t lod-sbmb .
+ ```
+ 
+ Running the tool:
+ ```
+ docker run -v "$(pwd)"/data:/data lod-sbmb -g
+                                            -s 2014 -e 2017 
+                                            -n wet -f loi -t LAW 
+                                            -w 10
+                                            -o /data/out
+```
+**Note that base-URL already is configured in the docker image. There is thus no need to provide it in the command.
+
 ## Ontology
 
 See also the [technical specifications page of the European Legislation Identifier](http://publications.europa.eu/mdr/eli/index.html)
