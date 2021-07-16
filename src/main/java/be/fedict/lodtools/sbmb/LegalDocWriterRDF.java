@@ -132,6 +132,8 @@ public class LegalDocWriterRDF implements LegalDocWriter {
 					m.add(id, ELI.DATE_PUBLICATION, pubDate);
 				}
 				
+				m.add(id, ELI.ID_LOCAL, F.createLiteral(doc.getLocalId()));
+				
 				// Alias / sameas
 				String lang = doc.getLang();
 				String t = types.get(lang);

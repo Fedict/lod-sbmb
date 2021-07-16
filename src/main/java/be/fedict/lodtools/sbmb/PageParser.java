@@ -132,6 +132,9 @@ public class PageParser {
 		for (Element link : links) {
 			try {
 				URL u = new URL(link.attr("href"));
+				String urlParts[] = u.getPath().split("/");
+				String numac = urlParts[6];
+				doc.setLocalId(numac);
 				if (link.ownText().trim().startsWith("Justel")) {
 					doc.setId(u.toString().replaceFirst("/justel", ""));
 					doc.setJustel(u);
