@@ -3,13 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>be.fedict.lodtools</groupId>
   <artifactId>lod-sbmb</artifactId>
-  <version>1.1.1</version>
+  <version>1.11.0</version>
   <description>Tool for converting Belgian Staatsblad / Moniteur belge titles to linked data</description>
   <build>
     <plugins>
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.0.2</version>
+        <version>3.2.0</version>
         <configuration>
           <archive>
             <manifest>
@@ -21,7 +21,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>2.4.3</version>
+        <version>3.2.4</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -55,10 +55,9 @@
     </plugins>
   </build>
   <properties>
-    <rdf4j.version>2.3.2</rdf4j.version>
+    <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <rdf4j.version>3.7.1</rdf4j.version>
   </properties>
 </project>
-

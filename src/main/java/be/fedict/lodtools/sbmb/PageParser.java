@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -41,7 +40,7 @@ import java.util.regex.Pattern;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 import org.jsoup.select.Elements;
 
 import org.slf4j.Logger;
@@ -57,7 +56,7 @@ public class PageParser {
 	private final static Logger LOG = LoggerFactory.getLogger(PageParser.class);
 	private final static Pattern TITLE
 		= Pattern.compile("^((\\d{1,2}|1er)\\.? [a-zA-Z]+ \\d{4})([ ._-]+)(.+)$");
-	private final static Whitelist SAFE = Whitelist.relaxed().addTags("font");
+	private final static Safelist SAFE = Safelist.relaxed().addTags("font");
 
 	/**
 	 * Parse description from overview page

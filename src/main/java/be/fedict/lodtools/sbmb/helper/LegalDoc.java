@@ -74,7 +74,7 @@ public class LegalDoc {
 	/**
 	 * Set local identifier ("NUMAC")
 	 * 
-	 * @param id identifier 
+	 * @param localId identifier 
 	 */
 	public void setLocalId(String localId) {
 		this.localId = localId;
