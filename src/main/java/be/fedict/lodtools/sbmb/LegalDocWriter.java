@@ -34,20 +34,20 @@ import java.util.Map;
 
 /**
  * Writer legaldoc objects to file system.
- * 
+ *
  * @author Bart.Hanssens
  */
 public interface LegalDocWriter {
-	
+
 	/**
 	 * Write (titles of) legal documents to a file
-	 * 
+	 *
 	 * @param docs list of legaldocs
 	 * @param outfile output file
 	 * @param year year
 	 * @param type common type
 	 * @param types language-specific types
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public void write(List<LegalDoc> docs, Path outfile, int year, String type, 
 								Map<String,String> types) throws IOException;
