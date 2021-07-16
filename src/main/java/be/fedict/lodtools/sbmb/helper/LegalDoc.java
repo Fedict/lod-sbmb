@@ -35,6 +35,7 @@ import java.time.LocalDate;
  */
 public class LegalDoc {
 	private String id;
+	private String localId;
 	private String title;
 	private String source;
 	private String lang;
@@ -59,6 +60,24 @@ public class LegalDoc {
 	 */
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	/**
+	 * Get local identifier ("NUMAC")
+	 * 
+	 * @return identifier
+	 */
+	public String getLocalId() {
+		return localId;
+	}
+
+	/**
+	 * Set local identifier ("NUMAC")
+	 * 
+	 * @param id identifier 
+	 */
+	public void setLocalId(String localId) {
+		this.localId = localId;
 	}
 
 	/**

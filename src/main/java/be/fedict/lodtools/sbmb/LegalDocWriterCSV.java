@@ -88,14 +88,14 @@ public class LegalDocWriterCSV implements LegalDocWriter {
 		try (BufferedWriter w = Files.newBufferedWriter(outfile);
 			CSVWriter csv = new CSVWriter(w)) {
 			
-			String[] header = { "ID", "JUSTEL", "DOCTYPE", 
+			String[] header = { "ID", "JUSTEL", "DOCTYPE", "NUMAC",
 								"DOCDATE", "PUBDATE", "LANG", 
 								"TYPE" , "SOURCE", "TITLE" };	
 			csv.writeNext(header);
 			
 			for (LegalDoc doc: docs) {
 				String[] row = {
-					doc.getId(), doc.getJustel().toString(), type,
+					doc.getId(), doc.getJustel().toString(), type, doc.getLocalId(),
 					toDate(doc.getDocDate()), toDate(doc.getPubDate()), doc.getLang(),
 					types.get(doc.getLang()), doc.getSource(), doc.getTitle() };
 				csv.writeNext(row);

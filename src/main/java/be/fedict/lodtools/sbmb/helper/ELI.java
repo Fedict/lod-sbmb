@@ -44,6 +44,7 @@ public class ELI {
 
 	public static final IRI DATE_DOCUMENT;
 	public static final IRI DATE_PUBLICATION;
+	public static final IRI ID_LOCAL;
 	public static final IRI EMBODIES;
 	public static final IRI FORMAT_PROP;
 	public static final IRI IS_EMBODIED_BY;
@@ -67,6 +68,7 @@ public class ELI {
 		
 		DATE_DOCUMENT = F.createIRI(NAMESPACE, "date_document");
 		DATE_PUBLICATION = F.createIRI(NAMESPACE, "date_publication");
+		ID_LOCAL = F.createIRI(NAMESPACE, "id_local");
 		EMBODIES = F.createIRI(NAMESPACE, "embodies");
 		FORMAT_PROP = F.createIRI(NAMESPACE, "format");
 		IS_EMBODIED_BY = F.createIRI(NAMESPACE, "is_embodied_by");
