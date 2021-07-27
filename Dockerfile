@@ -7,6 +7,6 @@ RUN mvn -f /tmp/pom.xml -s /usr/share/maven/ref/settings-docker.xml clean packag
 FROM openjdk:8-jre-slim
 
 RUN mkdir /data
-COPY --from=builder /tmp/target/lod-sbmb-1.10.1.jar /usr/local/lib/
+COPY --from=builder /tmp/target/lod-sbmb*.jar /usr/local/lib/lod-sbmb.jar
 
-ENTRYPOINT ["java","-jar","/usr/local/lib/lod-sbmb-1.10.1.jar","-b","http://www.ejustice.just.fgov.be/eli"]
+ENTRYPOINT ["java","-jar","/usr/local/lib/lod-sbmb.jar","-b","http://www.ejustice.just.fgov.be/eli"]
